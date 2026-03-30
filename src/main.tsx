@@ -2,7 +2,12 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { routeTree } from './routes/route-tree';
+import { applyDuskMode } from './lib/dusk';
 import './index.css';
+
+// Set data-theme="dusk" on <html> if local time is 20:00–05:59. Runs once
+// before render so the correct palette is in place before first paint.
+applyDuskMode();
 
 const router = createRouter({ routeTree });
 

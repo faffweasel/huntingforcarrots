@@ -86,12 +86,12 @@ This is NOT the faffweasel palette. Do not use `#007070` or Courier New anywhere
 | Stone shadow | `#6b6358` | `#4a4540` | `fill-stone-shadow` |
 | Moss | `#7a8c6a` | `#5a6c4a` | `fill-moss` |
 | Text | `#3a3530` | `#c8c0b8` | `text-primary` |
-| Muted | `#8a8278` | `#7a7268` | `text-muted` |
-| Interactive | `#6b7c5a` | `#8a9c7a` | `text-interactive` |
-| Border | `#d8d0c4` | `#2e2a26` | `border-default` |
+| Muted | `#746c62` | `#948c82` | `text-muted` |
+| Interactive | `#586947` | `#8a9c7a` | `text-interactive` |
+| Border | `#928a7e` | `#6d6a67` | `border-default` |
 | Surface | `#faf6f0` | `#222018` | `bg-surface` |
 
-Define as CSS custom properties in `index.css`, reference from Tailwind config. Dark mode via `prefers-color-scheme` media query on the custom properties — not Tailwind's `dark:` prefix class strategy.
+Define as CSS custom properties in `index.css`. Dark mode triggered by `[data-theme="dusk"]` on `<html>` — set once on page load by `src/lib/dusk.ts` based on local time (20:00–05:59). Do NOT use `prefers-color-scheme` or Tailwind's `dark:` prefix strategy.
 
 ### Typography
 
@@ -108,6 +108,8 @@ font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 | Small | 400 | 13px |
 
 No web fonts. System sans-serif stack only. This is a privacy constraint, not a suggestion.
+
+Heading treatment (wordmark, page titles, section labels): `font-weight: 300`, `text-transform: uppercase`, `letter-spacing: 0.12–0.15em`. Source text is written in title case — CSS handles the uppercase rendering. Do not write source copy in ALL CAPS.
 
 ## Garden generation rules
 

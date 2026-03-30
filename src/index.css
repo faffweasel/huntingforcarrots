@@ -32,25 +32,23 @@
   --space-2xl: 96px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1816;
-    --sand: #2a2520;
-    --surface: #222018;
+[data-theme="dusk"] {
+  --bg: #1a1816;
+  --sand: #2a2520;
+  --surface: #222018;
 
-    --text: #c8c0b8;
-    --muted: #948c82;
+  --text: #c8c0b8;
+  --muted: #948c82;
 
-    --interactive: #8a9c7a;
-    --interactive-visited: #6b7a5d;
-    --focus-ring: #8a9c7a;
+  --interactive: #8a9c7a;
+  --interactive-visited: #6b7a5d;
+  --focus-ring: #8a9c7a;
 
-    --border: #6d6a67;
+  --border: #6d6a67;
 
-    --stone: #6b6560;
-    --stone-shadow: #4a4540;
-    --moss: #5a6c4a;
-  }
+  --stone: #6b6560;
+  --stone-shadow: #4a4540;
+  --moss: #5a6c4a;
 }
 
 :focus-visible {

@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds */
+  --bg: #f5f0eb;
+  --sand: #e8e0d4;
+  --surface: #faf6f0;
+
+  /* Text */
+  --text: #3a3530;
+  --muted: #746c62;
+
+  /* Interactive */
+  --interactive: #586947;
+  --interactive-visited: #6b6358;
+  --focus-ring: #586947;
+
+  /* Structure */
+  --border: #928a7e;
+
+  /* Garden SVG (not for UI use) */
+  --stone: #8a8278;
+  --stone-shadow: #6b6358;
+  --moss: #7a8c6a;
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 32px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1816;
+    --sand: #2a2520;
+    --surface: #222018;
+
+    --text: #c8c0b8;
+    --muted: #948c82;
+
+    --interactive: #8a9c7a;
+    --interactive-visited: #6b7a5d;
+    --focus-ring: #8a9c7a;
+
+    --border: #6d6a67;
+
+    --stone: #6b6560;
+    --stone-shadow: #4a4540;
+    --moss: #5a6c4a;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  font-size: 16px;
+  margin: 0;
+}

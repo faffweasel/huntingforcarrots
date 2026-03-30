@@ -23,12 +23,13 @@ const VIEWBOXES: Record<CompositionMode, { readonly width: number; readonly heig
 
 // Default stone totals — odd only, per CLAUDE.md garden rules.
 const DEFAULT_STONE_TOTALS: readonly number[] = [3, 5, 7];
-const DEFAULT_RAKE_SPACING = { min: 8, max: 12 };
+const DEFAULT_RAKE_SPACING = { min: 10, max: 14 };
 
 export function compose(
   prng: () => number,
   mode: CompositionMode,
-  config?: ResponsiveConfig
+  config?: ResponsiveConfig,
+  viewport?: { readonly width: number; readonly height: number }
 ): Composition {
   const viewBox = VIEWBOXES[mode];
   const stoneTotals = config?.stoneTotals ?? DEFAULT_STONE_TOTALS;
@@ -55,7 +56,9 @@ export function compose(
   }
 
   // --- Viewport clamping: shift groups so no stone clips above/below viewport ---
-  clampGroupsToViewport(stoneGroups, viewBox, 20);
+  // Margin accounts for xMidYMid slice cropping on wide screens.
+  const margin = computeSliceMargin(viewBox, viewport);
+  clampGroupsToViewport(stoneGroups, viewBox, margin);
 
   // --- Compute max ring expansions (prevent inter-group ring overlap) ---
   const maxExpansions = computeMaxExpansions(stoneGroups);
@@ -205,6 +208,32 @@ function occupiedFraction(
     occupied += Math.PI * group.boundingRadius ** 2;
   }
   return Math.min(1, occupied / totalArea);
+}
+
+/**
+ * Computes the safe margin for viewport clamping, accounting for
+ * `preserveAspectRatio="xMidYMid slice"` cropping.
+ *
+ * When the viewport is wider than the viewBox aspect ratio, the SVG is
+ * scaled to fill width and the top/bottom are cropped. The margin must
+ * keep stones inside the visible region, not just inside the viewBox.
+ */
+function computeSliceMargin(
+  viewBox: { readonly width: number; readonly height: number },
+  viewport?: { readonly width: number; readonly height: number }
+): number {
+  const BASE_MARGIN = 20;
+  if (!viewport) return BASE_MARGIN;
+
+  const svgAspect = viewBox.width / viewBox.height;
+  const vpAspect = viewport.width / viewport.height;
+
+  // If viewport aspect <= viewBox aspect, Y axis is not cropped.
+  if (vpAspect <= svgAspect) return BASE_MARGIN;
+
+  // viewBox units cropped from top (and bottom) by xMidYMid slice.
+  const cropVB = (viewBox.height * (1 - svgAspect / vpAspect)) / 2;
+  return Math.max(BASE_MARGIN, Math.ceil(cropVB) + 15);
 }
 
 /**

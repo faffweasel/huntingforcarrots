@@ -15,16 +15,17 @@ function getMode(): CompositionMode {
 }
 
 function getResponsiveConfig(width: number): ResponsiveConfig {
-  if (width > 1024) return { stoneTotals: [3, 5, 7], rakeSpacing: { min: 8, max: 10 } };
-  if (width >= 768) return { stoneTotals: [3, 5], rakeSpacing: { min: 10, max: 12 } };
-  return { stoneTotals: [3, 5], rakeSpacing: { min: 12, max: 15 } };
+  if (width > 1024) return { stoneTotals: [3, 5, 7], rakeSpacing: { min: 10, max: 12 } };
+  if (width >= 768) return { stoneTotals: [3, 5], rakeSpacing: { min: 12, max: 14 } };
+  return { stoneTotals: [3, 5], rakeSpacing: { min: 14, max: 17 } };
 }
 
 function buildSvg(seed: string): string {
   const mode = getMode();
   const config = getResponsiveConfig(window.innerWidth);
   const prng = createPrng(hashSeed(seed));
-  return renderGarden(compose(prng, mode, config));
+  const viewport = { width: window.innerWidth, height: window.innerHeight };
+  return renderGarden(compose(prng, mode, config, viewport));
 }
 
 const CROSSFADE_MS = 300;

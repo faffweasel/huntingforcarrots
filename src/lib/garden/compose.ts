@@ -57,13 +57,27 @@ export function compose(
   // --- Viewport clamping: shift groups so no stone clips above/below viewport ---
   clampGroupsToViewport(stoneGroups, viewBox, 20);
 
+  // --- Compute max ring expansions (prevent inter-group ring overlap) ---
+  const maxExpansions = computeMaxExpansions(stoneGroups);
+
   // --- Rake patterns ---
   const concentricPaths: string[] = [];
-  for (const group of stoneGroups) {
-    concentricPaths.push(...generateConcentricRake(prng, group).paths);
+  const concentricOpacities: number[] = [];
+  const outermostRadii: number[] = [];
+  for (let i = 0; i < stoneGroups.length; i++) {
+    const result = generateConcentricRake(prng, stoneGroups[i], maxExpansions[i]);
+    concentricPaths.push(...result.paths);
+    concentricOpacities.push(...result.opacities);
+    outermostRadii.push(result.outermostRadius);
   }
-  const concentricRake: RakePattern = { paths: concentricPaths };
-  const parallelRake = generateParallelRake(prng, viewBox, rakeSpacing);
+  const concentricRake: RakePattern = { paths: concentricPaths, opacities: concentricOpacities };
+  // Exclusion zones derived from actual outermost ring radius + 8px gap.
+  const exclusionZones = stoneGroups.map((g, i) => ({
+    cx: g.center.x,
+    cy: g.center.y,
+    radius: outermostRadii[i] + 8,
+  }));
+  const parallelRake = generateParallelRake(prng, viewBox, rakeSpacing, exclusionZones);
 
   // --- Moss (0–3 patches, each anchored to a different stone base) ---
   const allStones = stoneGroups.flatMap((g) => [...g.stones]);
@@ -194,6 +208,41 @@ function occupiedFraction(
 }
 
 /**
+ * Computes the maximum ring expansion budget per group, preventing
+ * inter-group ring overlap.
+ *
+ * Default expansion = boundingRadius × 1.0 (rings extend to 2× bounding radius).
+ * When two groups' rings would overlap, the available gap (clearance minus
+ * 10px buffer) is split proportionally by bounding radius — larger groups
+ * get more expansion, smaller groups get less.
+ */
+function computeMaxExpansions(groups: readonly StoneGroup[]): number[] {
+  const expansions = groups.map((g) => g.boundingRadius * 1.0);
+
+  for (let i = 0; i < groups.length; i++) {
+    for (let j = i + 1; j < groups.length; j++) {
+      const dx = groups[i].center.x - groups[j].center.x;
+      const dy = groups[i].center.y - groups[j].center.y;
+      const dist = Math.sqrt(dx ** 2 + dy ** 2);
+      const clearance = dist - groups[i].boundingRadius - groups[j].boundingRadius;
+      const budget = Math.max(0, clearance - 10);
+
+      // Would both groups' rings overlap in the shared space?
+      if (expansions[i] + expansions[j] > budget) {
+        // Split proportionally by bounding radius so larger groups get more.
+        const totalBR = groups[i].boundingRadius + groups[j].boundingRadius;
+        const shareI = budget * (groups[i].boundingRadius / totalBR);
+        const shareJ = budget * (groups[j].boundingRadius / totalBR);
+        expansions[i] = Math.min(expansions[i], Math.max(20, shareI));
+        expansions[j] = Math.min(expansions[j], Math.max(20, shareJ));
+      }
+    }
+  }
+
+  return expansions;
+}
+
+/**
  * Shifts all y-coordinates in an absolute SVG path string by `dy`.
  * Paths use alternating (x, y) pairs throughout M and C commands.
  */
@@ -208,8 +257,31 @@ function shiftPathY(path: string, dy: number): string {
 }
 
 /**
+ * Extracts the minimum and maximum Y coordinates from an SVG path string.
+ * Paths use alternating (x, y) pairs — every odd-indexed number is a Y value.
+ * Includes Bézier control points, giving a conservative bounding box.
+ */
+function pathExtentsY(path: string): { minY: number; maxY: number } {
+  let minY = Infinity;
+  let maxY = -Infinity;
+  let index = 0;
+  path.replace(/-?\d+\.\d+/g, (match) => {
+    if (index % 2 === 1) {
+      const y = Number.parseFloat(match);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    }
+    index++;
+    return match;
+  });
+  return { minY, maxY };
+}
+
+/**
  * Ensures no stone in any group extends above `margin` or below
- * `viewBox.height - margin`. Shifts entire groups vertically when needed.
+ * `viewBox.height - margin`. Uses actual SVG path extents (not the
+ * simple y ± h/2 estimate) so rotated/perturbed stones are caught.
+ * Shifts entire groups vertically when needed.
  */
 function clampGroupsToViewport(
   groups: StoneGroup[],
@@ -221,8 +293,9 @@ function clampGroupsToViewport(
     let minY = Infinity;
     let maxY = -Infinity;
     for (const stone of group.stones) {
-      minY = Math.min(minY, stone.y - stone.height / 2);
-      maxY = Math.max(maxY, stone.y + stone.height / 2);
+      const extents = pathExtentsY(stone.path);
+      minY = Math.min(minY, extents.minY);
+      maxY = Math.max(maxY, extents.maxY);
     }
 
     let dy = 0;
@@ -233,6 +306,10 @@ function clampGroupsToViewport(
     }
 
     if (dy === 0) continue;
+
+    console.warn(
+      `[garden] group ${i} shifted by ${dy.toFixed(1)}px to stay within viewport (minY=${minY.toFixed(1)}, maxY=${maxY.toFixed(1)})`
+    );
 
     groups[i] = {
       stones: group.stones.map((stone) => ({

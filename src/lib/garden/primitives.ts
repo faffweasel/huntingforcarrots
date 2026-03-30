@@ -149,27 +149,39 @@ export function getStoneShadow(stone: Stone): StoneShadow {
 
 /** Exclusion radius for a stone group — covers outermost concentric ring plus margin. */
 export function exclusionRadius(group: StoneGroup): number {
-  return group.boundingRadius * 1.5 + 15;
+  return group.boundingRadius * 2.0 + 15;
 }
 
 /**
  * Generates concentric rings radiating outward from a stone group.
  *
- * Each ring is NOT a perfect ellipse — it follows the group's silhouette:
+ * Each ring follows the group's silhouette (not a perfect ellipse):
  * at each sample angle θ, the base radius = the furthest extent of any stone
  * in that direction from the group centre.
+ *
+ * Ring count is proportional to the group's expansion budget — larger groups
+ * get more rings, smaller groups get fewer, with consistent ~10px spacing.
+ * `maxExpansion` may be reduced by the caller to prevent inter-group overlap.
+ *
+ * Returns the actual outermost ring radius so the caller can derive
+ * exclusion zones from real geometry instead of a formula.
  */
-export function generateConcentricRake(prng: () => number, stoneGroup: StoneGroup): RakePattern {
-  // Limit outermost ring to ≈1.5× group bounding radius from centre.
-  // Rings are a localised accent, not the dominant visual element.
-  const maxExpansion = stoneGroup.boundingRadius * 0.5;
+export function generateConcentricRake(
+  prng: () => number,
+  stoneGroup: StoneGroup,
+  maxExpansion: number
+): { readonly paths: string[]; readonly opacities: number[]; readonly outermostRadius: number } {
   const BASE_GAP = 10;
-  const MIN_SPACING = 12;
-  const maxRings = Math.max(1, Math.floor((maxExpansion - BASE_GAP) / MIN_SPACING));
-  const ringCount = Math.min(randomInt(prng, 4, 6), maxRings);
-  const spacing = ringCount > 0 ? (maxExpansion - BASE_GAP) / ringCount : MIN_SPACING;
+  const TARGET_SPACING = 10;
+  const available = maxExpansion - BASE_GAP;
+  const ringCount =
+    available >= TARGET_SPACING
+      ? Math.max(3, Math.min(8, Math.floor(available / TARGET_SPACING)))
+      : 0;
+  const spacing = ringCount > 0 ? available / ringCount : TARGET_SPACING;
   const paths: string[] = [];
   const opacities: number[] = [];
+  let outermostRadius = stoneGroup.boundingRadius;
 
   for (let ring = 1; ring <= ringCount; ring++) {
     const ringExpansion = BASE_GAP + ring * spacing;
@@ -181,7 +193,6 @@ export function generateConcentricRake(prng: () => number, stoneGroup: StoneGrou
       const sinθ = Math.sin(θ);
 
       // Silhouette: furthest extent of any stone in direction θ from group centre.
-      // proj = scalar projection of stone offset onto unit direction (cosθ, sinθ).
       let silhouette = stoneGroup.boundingRadius;
       for (const stone of stoneGroup.stones) {
         const proj =
@@ -190,9 +201,13 @@ export function generateConcentricRake(prng: () => number, stoneGroup: StoneGrou
         silhouette = Math.max(silhouette, proj + stoneR);
       }
 
-      // Clamp silhouette to a non-negative value, then add ring expansion and
-      // a subtle per-point perturbation so the ring isn't mechanically uniform.
       const r = Math.max(0, silhouette) + ringExpansion + randomFloat(prng, -1.5, 1.5);
+
+      // Track the outermost ring's maximum radius for exclusion zone derivation.
+      if (ring === ringCount) {
+        outermostRadius = Math.max(outermostRadius, r);
+      }
+
       pts.push({
         x: stoneGroup.center.x + r * cosθ,
         y: stoneGroup.center.y + r * sinθ,
@@ -202,25 +217,25 @@ export function generateConcentricRake(prng: () => number, stoneGroup: StoneGrou
     paths.push(buildSmoothClosedPath(pts));
 
     // Outer rings fade out so concentric pattern dissolves into parallel lines.
-    // Outermost ring = 0.3, second-to-last = 0.6, all others = 1.0.
     const fromEnd = ringCount - ring;
     opacities.push(fromEnd === 0 ? 0.3 : fromEnd === 1 ? 0.6 : 1.0);
   }
 
-  return { paths, opacities };
+  return { paths, opacities, outermostRadius };
 }
 
 /**
- * Generates horizontal parallel rake lines across the full viewport.
+ * Generates horizontal parallel rake lines across the viewport, clipped
+ * around exclusion zones so lines do not draw through concentric ring areas.
  *
- * Lines run edge-to-edge with a gentle quadratic bow (±4px). Concentric
- * rings are rendered on top — the parallel lines pass behind them, so no
- * exclusion gaps are needed.
+ * Lines run with a gentle quadratic bow (±4px). Where a line would pass
+ * through an exclusion circle, it stops before the zone and resumes after.
  */
 export function generateParallelRake(
   prng: () => number,
   viewBox: { readonly width: number; readonly height: number },
-  rakeSpacing?: { readonly min: number; readonly max: number }
+  rakeSpacing?: { readonly min: number; readonly max: number },
+  exclusions?: readonly { readonly cx: number; readonly cy: number; readonly radius: number }[]
 ): RakePattern {
   const { min, max } = rakeSpacing ?? { min: 8, max: 12 };
   const spacing = randomFloat(prng, min, max);
@@ -230,14 +245,72 @@ export function generateParallelRake(
   let y = spacing / 2;
   while (y < viewBox.height) {
     const curveOffset = randomFloat(prng, -4, 4);
-    const midX = viewBox.width / 2;
-    paths.push(`M ${f(0)} ${f(y)} Q ${f(midX)} ${f(y + curveOffset)} ${f(viewBox.width)} ${f(y)}`);
+    const segments = clipLineToExclusions(0, viewBox.width, y, exclusions ?? []);
+
+    for (const [x1, x2] of segments) {
+      const midX = (x1 + x2) / 2;
+      paths.push(`M ${f(x1)} ${f(y)} Q ${f(midX)} ${f(y + curveOffset)} ${f(x2)} ${f(y)}`);
+    }
 
     // ±8% random variation in line spacing to break the scan-line feel.
     y += spacing * randomFloat(prng, 0.92, 1.08);
   }
 
   return { paths };
+}
+
+/**
+ * Clips a horizontal line segment to avoid circular exclusion zones.
+ * Returns (startX, endX) pairs for segments that lie outside all zones.
+ * Segments shorter than 10px are dropped to avoid visual noise.
+ */
+function clipLineToExclusions(
+  startX: number,
+  endX: number,
+  y: number,
+  exclusions: readonly { readonly cx: number; readonly cy: number; readonly radius: number }[]
+): ReadonlyArray<[number, number]> {
+  if (exclusions.length === 0) return [[startX, endX]];
+
+  // Collect exclusion intervals where circles intersect this y
+  const intervals: Array<[number, number]> = [];
+  for (const zone of exclusions) {
+    const dy = y - zone.cy;
+    const r2 = zone.radius ** 2;
+    if (dy ** 2 >= r2) continue;
+    const dx = Math.sqrt(r2 - dy ** 2);
+    intervals.push([zone.cx - dx, zone.cx + dx]);
+  }
+
+  if (intervals.length === 0) return [[startX, endX]];
+
+  // Sort by start, merge overlapping
+  intervals.sort((a, b) => a[0] - b[0]);
+  const merged: Array<[number, number]> = [intervals[0]];
+  for (let i = 1; i < intervals.length; i++) {
+    const last = merged[merged.length - 1];
+    if (intervals[i][0] <= last[1]) {
+      last[1] = Math.max(last[1], intervals[i][1]);
+    } else {
+      merged.push(intervals[i]);
+    }
+  }
+
+  // Build gap segments outside exclusion zones
+  const segments: Array<[number, number]> = [];
+  let cursor = startX;
+  for (const [iStart, iEnd] of merged) {
+    if (iStart > cursor) {
+      segments.push([cursor, Math.min(iStart, endX)]);
+    }
+    cursor = Math.max(cursor, iEnd);
+  }
+  if (cursor < endX) {
+    segments.push([cursor, endX]);
+  }
+
+  // Drop tiny segments that would look like visual noise
+  return segments.filter(([a, b]) => b - a >= 10);
 }
 
 /**

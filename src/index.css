@@ -22,6 +22,10 @@
   --stone: #8a8278;
   --stone-shadow: #6b6358;
   --moss: #7a8c6a;
+  --rake-line: #d8d0c5;
+
+  /* Component backdrops */
+  --trigger-backdrop: rgb(from var(--sand) r g b / 0.7);
 
   /* Spacing scale */
   --space-xs: 4px;
@@ -33,22 +37,25 @@
 }
 
 [data-theme="dusk"] {
-  --bg: #1a1816;
-  --sand: #2a2520;
-  --surface: #222018;
-
-  --text: #c8c0b8;
-  --muted: #948c82;
-
+  /* Cool sky — UI chrome */
+  --bg: #1a1d24;
+  --surface: #242830;
+  --text: #d4d0cc;
+  --muted: #8a8d94;
   --interactive: #8a9c7a;
   --interactive-visited: #6b7a5d;
   --focus-ring: #8a9c7a;
+  --border: #3a3d44;
 
-  --border: #6d6a67;
+  /* Component backdrops — cool bg works well against warm garden in dusk */
+  --trigger-backdrop: rgb(from var(--bg) r g b / 0.6);
 
-  --stone: #6b6560;
+  /* Warm earth — garden materials */
+  --sand: #2a2520;
+  --stone: #7d756e;
   --stone-shadow: #4a4540;
   --moss: #5a6c4a;
+  --rake-line: #37302a;
 }
 
 :focus-visible {

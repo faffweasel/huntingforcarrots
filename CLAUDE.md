@@ -2,7 +2,7 @@
 
 ## Project
 
-Generative Zen Garden homepage for huntingforcarrots.com, plus navigation shell for a suite of reflective wellbeing tools. Client-side only, no backend, no data collection, zero network requests after page load.
+Generative Zen Garden homepage for huntingforcarrots.com, plus navigation shell for a suite of reflective wellbeing tools. Client-side only, no backend, no data collection, zero external network requests after page load (same-origin static assets like bell audio are permitted).
 
 Part of the Faffweasel Industries portfolio but a **separate brand** — do not apply faffweasel visual identity (no monospace, no grey/teal, no punk register). huntingforcarrots is zen, warm, space-forward.
 
@@ -50,7 +50,7 @@ src/
 │   │   ├── TimerPanel.tsx
 │   │   ├── TimerIcon.tsx
 │   │   ├── ScrollWheel.tsx   ← minute selector wheel
-│   │   └── bell.ts          ← Web Audio API singing bowl synthesis
+│   │   └── bell.ts          ← Web Audio API sample playback
 │   └── nav/             ← hamburger menu / navigation panel
 │       ├── NavPanel.tsx
 │       └── NavIcon.tsx
@@ -70,7 +70,7 @@ src/
 - `src/lib/` is pure: no React, no DOM, no browser APIs. Functions take data in, return data out. These must be independently testable.
 - `src/data/` is static JSON only. No code.
 - `src/components/garden/` generates SVG data structures; `GardenCanvas.tsx` renders them. Keep generation logic separate from rendering.
-- `bell.ts` is the only file that touches Web Audio API. It exports a `playBell()` function, nothing else.
+- `bell.ts` is the only file that touches Web Audio API. It exports `loadBells()` and `strikeBell()` functions, nothing else.
 
 ## Design tokens
 
@@ -78,20 +78,23 @@ This is NOT the faffweasel palette. Do not use `#007070` or Courier New anywhere
 
 ### Palette
 
-| Role | Light | Dark | Tailwind class pattern |
+| Role | Light | Dusk | Tailwind class pattern |
 |------|-------|------|----------------------|
-| Background | `#f5f0eb` | `#1a1816` | `bg-background` |
+| Background | `#f5f0eb` | `#1a1d24` | `bg-background` |
 | Sand | `#e8e0d4` | `#2a2520` | `bg-sand` |
-| Stone | `#8a8278` | `#6b6560` | `fill-stone` |
+| Stone | `#8a8278` | `#7d756e` | `fill-stone` |
 | Stone shadow | `#6b6358` | `#4a4540` | `fill-stone-shadow` |
 | Moss | `#7a8c6a` | `#5a6c4a` | `fill-moss` |
-| Text | `#3a3530` | `#c8c0b8` | `text-primary` |
-| Muted | `#746c62` | `#948c82` | `text-muted` |
+| Text | `#3a3530` | `#d4d0cc` | `text-primary` |
+| Muted | `#746c62` | `#8a8d94` | `text-muted` |
 | Interactive | `#586947` | `#8a9c7a` | `text-interactive` |
-| Border | `#928a7e` | `#6d6a67` | `border-default` |
-| Surface | `#faf6f0` | `#222018` | `bg-surface` |
+| Border | `#928a7e` | `#3a3d44` | `border-default` |
+| Surface | `#faf6f0` | `#242830` | `bg-surface` |
+| Rake line | (darker than sand) | `#37302a` | `stroke-rake` |
 
-Define as CSS custom properties in `index.css`. Dark mode triggered by `[data-theme="dusk"]` on `<html>` — set once on page load by `src/lib/dusk.ts` based on local time (20:00–05:59). Do NOT use `prefers-color-scheme` or Tailwind's `dark:` prefix strategy.
+Define as CSS custom properties in `index.css`. Dusk mode triggered by `[data-theme="dusk"]` on `<html>` — set once on page load by `src/lib/dusk.ts` based on local time (20:00–05:59). Do NOT use `prefers-color-scheme` or Tailwind's `dark:` prefix strategy.
+
+Dusk design principle: **cool sky, warm earth.** UI chrome (bg, surface, text, border) uses cool blue-grey tones. Garden materials (sand, stone, moss, rake lines) retain warm earth tones.
 
 ### Typography
 
@@ -161,9 +164,9 @@ Fragment composition, not word-level slot-filling. Three banks of curated line f
 ## Timer
 
 - Duration: scroll wheel, 1–60 minutes, snap-to-minute, default 5.
-- Bell: Web Audio API synthesis. Damped sinusoid with harmonics (~300–400Hz fundamental, overtones at ~2.5× and ~4.5× fundamental, exponential decay 3–5s). No audio files.
+- Bell: Two real singing bowl recordings in `public/audio/` — `bell-begin.mp3` (lighter strike) and `bell-complete.mp3` (fuller strike). Played via Web Audio API `AudioBufferSourceNode`. No synthesis. Buffers loaded once on first user gesture, cached thereafter.
 - Web Audio context must be created on user gesture (the Begin button). Do not initialise on page load.
-- Bell plays on start and on completion.
+- Bell plays on start (begin sample) and on completion (complete sample).
 - Selected duration persists in `localStorage` key `hfc-timer-duration`.
 - No streaks, no history, no gamification.
 - Visual pulse on timer icon for deaf/HoH users when bell plays.
@@ -209,7 +212,7 @@ Fragment composition, not word-level slot-filling. Three banks of curated line f
 - Use `Math.random()` in any generation code.
 - Import web fonts or external stylesheets.
 - Add analytics, tracking, cookies (except the one `localStorage` key for timer duration).
-- Make network requests after page load.
+- Make external network requests after page load.
 - Use faffweasel design tokens (no `#007070`, no Courier New, no teal).
 - Centre stone groups or use even numbers of stones.
 - Render haiku as `<text>` inside SVG.

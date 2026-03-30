@@ -13,8 +13,18 @@ export type MenuSection = {
 export const menuSections: readonly MenuSection[] = [
   {
     items: [
-      { label: 'The Garden', href: 'https://huntingforcarrots.com', external: true, status: 'active' },
-      { label: 'Find My Way', href: 'https://findmyway.huntingforcarrots.com', external: true, status: 'active' },
+      {
+        label: 'The Garden',
+        href: 'https://huntingforcarrots.com',
+        external: true,
+        status: 'active',
+      },
+      {
+        label: 'Find My Way',
+        href: 'https://findmyway.huntingforcarrots.com',
+        external: true,
+        status: 'active',
+      },
     ],
   },
   {
@@ -25,9 +35,6 @@ export const menuSections: readonly MenuSection[] = [
     ],
   },
   {
-    items: [
-      { label: 'About', href: '/about', external: false, status: 'active' },
-      { label: 'Made by Faffweasel', href: 'https://faffweasel.com', external: true, status: 'active' },
-    ],
+    items: [{ label: 'About', href: '/about', external: false, status: 'active' }],
   },
 ] as const;

@@ -112,7 +112,7 @@ font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 
 No web fonts. System sans-serif stack only. This is a privacy constraint, not a suggestion.
 
-Heading treatment (wordmark, page titles, section labels): `font-weight: 300`, `text-transform: uppercase`, `letter-spacing: 0.12–0.15em`. Source text is written in title case — CSS handles the uppercase rendering. Do not write source copy in ALL CAPS.
+Heading treatment (wordmark, page titles, section labels): `font-weight: 300`, `letter-spacing: 0.12–0.15em`, `color: var(--muted)`. Title case as written — no `text-transform: uppercase`. Uppercase headings are reserved for the faffweasel brand.
 
 ## Garden generation rules
 

@@ -143,19 +143,19 @@ const VIEWBOX = { width: 1000, height: 700 };
 
 describe('generateConcentricRake', () => {
   it('produces ring paths scaled to bounding radius', () => {
-    // Ring count capped by maxRings: floor((boundingRadius*0.5 - 10) / 12).
-    // boundingRadius=80 → maxRings=2, so count is always ≤ 2 for this group.
+    // ringCount = clamp(2–7, floor((maxExpansion - 10) / 10)).
+    // boundingRadius=80, maxExpansion=80 → available=70 → 7 rings.
     for (const seed of [1, 42, 99, 256, 1000]) {
       const group = makeGroup(500, 350, 80);
-      const rake = generateConcentricRake(createPrng(seed), group);
-      expect(rake.paths.length).toBeGreaterThanOrEqual(1);
-      expect(rake.paths.length).toBeLessThanOrEqual(6);
+      const rake = generateConcentricRake(createPrng(seed), group, group.boundingRadius);
+      expect(rake.paths.length).toBeGreaterThanOrEqual(2);
+      expect(rake.paths.length).toBeLessThanOrEqual(7);
     }
   });
 
   it('every ring path is a valid closed SVG path', () => {
     const group = makeGroup(500, 350, 80);
-    const rake = generateConcentricRake(createPrng(7), group);
+    const rake = generateConcentricRake(createPrng(7), group, group.boundingRadius);
     for (const path of rake.paths) {
       expect(path).toMatch(/^M /);
       expect(path).toContain(' C ');
@@ -165,7 +165,7 @@ describe('generateConcentricRake', () => {
 
   it('rings expand outward — later rings are larger than earlier ones', () => {
     const group = makeGroup(500, 350, 80);
-    const rake = generateConcentricRake(createPrng(42), group);
+    const rake = generateConcentricRake(createPrng(42), group, group.boundingRadius);
     // Rough size proxy: path string length grows as rings get larger.
     // A more reliable check: compare the bounding x-extent of successive rings.
     // Extract all x coordinates from each path and compare max values.
@@ -181,15 +181,15 @@ describe('generateConcentricRake', () => {
 
   it('same seed produces identical rake', () => {
     const group = makeGroup(500, 350, 80);
-    const r1 = generateConcentricRake(createPrng(99), group);
-    const r2 = generateConcentricRake(createPrng(99), group);
+    const r1 = generateConcentricRake(createPrng(99), group, group.boundingRadius);
+    const r2 = generateConcentricRake(createPrng(99), group, group.boundingRadius);
     expect(r1).toEqual(r2);
   });
 
   it('returns per-ring opacities with outer rings fading out', () => {
     // Use a large bounding radius to ensure enough room for multiple rings.
     const group = makeGroup(500, 350, 200);
-    const rake = generateConcentricRake(createPrng(42), group);
+    const rake = generateConcentricRake(createPrng(42), group, group.boundingRadius);
     const opacities = rake.opacities ?? [];
     expect(opacities.length).toBe(rake.paths.length);
     // Outermost ring should be 0.3.

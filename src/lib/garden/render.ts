@@ -12,26 +12,28 @@ function n(value: number): string {
  * Render order (painter's algorithm, back to front):
  *   1. Sand background
  *   2. Parallel rake lines
- *   3. Concentric rake lines
- *   4. Stone shadows
- *   5. Stones (with depth-cue opacity and per-stone brightness variation)
- *   6. Moss patches
+ *   3. Island ellipses (subtle sand mound behind stone groups)
+ *   4. Concentric rake lines
+ *   5. Stone shadows
+ *   6. Stones (with depth-cue opacity and per-stone brightness variation)
+ *   7. Moss patches
  *
  * All colours reference CSS custom properties — dark mode is automatic.
  * No <text> elements — haiku is rendered as HTML over the SVG.
  */
 export function renderGarden(composition: Composition): string {
-  const { viewBox, stoneGroups, moss, concentricRake, parallelRake } = composition;
+  const { viewBox, stoneGroups, moss, concentricRake, parallelRake, debugLayers } = composition;
   const vb = `0 0 ${viewBox.width} ${viewBox.height}`;
   const label = buildAriaLabel(composition);
+  const debug = debugLayers === true;
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${label}">`,
     `<rect width="${viewBox.width}" height="${viewBox.height}" fill="var(--sand)"/>`,
-    renderIslands(stoneGroups),
-    renderRakeGroup(parallelRake),
-    renderRakeGroup(concentricRake),
-    renderShadows(stoneGroups),
+    renderRakeGroup(parallelRake, debug ? '#ff0000' : undefined),
+    renderIslands(stoneGroups, debug),
+    renderRakeGroup(concentricRake, debug ? '#0000ff' : undefined),
+    renderShadows(stoneGroups, debug ? '#ffff00' : undefined),
     renderStones(stoneGroups, viewBox.height),
     renderMossPatches(moss),
     '</svg>',
@@ -41,11 +43,12 @@ export function renderGarden(composition: Composition): string {
 // ─── Layer renderers ──────────────────────────────────────────────────────────
 
 /** Subtle mound effect behind each stone group — barely visible lightening of the sand. */
-function renderIslands(groups: readonly StoneGroup[]): string {
+function renderIslands(groups: readonly StoneGroup[], debug?: boolean): string {
   if (groups.length === 0) return '';
-  const ISLAND_PADDING = 12;
+  const ISLAND_PADDING = 8;
   const ellipses: string[] = [];
-  for (const group of groups) {
+  for (let idx = 0; idx < groups.length; idx++) {
+    const group = groups[idx];
     // Compute actual stone extents from group centre rather than using boundingRadius.
     // Island extends only 10–15px beyond outermost stone edge — a subtle grounding element.
     let maxExtentX = 0;
@@ -56,25 +59,43 @@ function renderIslands(groups: readonly StoneGroup[]): string {
     }
     const rx = maxExtentX + ISLAND_PADDING;
     const ry = maxExtentY * 0.4 + ISLAND_PADDING;
+
+    if (debug) {
+      console.log(
+        `[debug] island ${idx}: cx=${n(group.center.x)} cy=${n(group.center.y)}` +
+          ` rx=${n(rx)} ry=${n(ry)}` +
+          ` fill=white opacity=0.03` +
+          ` maxExtentX=${n(maxExtentX)} maxExtentY=${n(maxExtentY)}` +
+          ` svgElementIndex=3 (after sand + parallel rake)`
+      );
+    }
+
     ellipses.push(
       `<ellipse cx="${n(group.center.x)}" cy="${n(group.center.y)}" rx="${n(rx)}" ry="${n(ry)}"/>`
     );
   }
-  return `<g fill="white" opacity="0.03">${ellipses.join('')}</g>`;
+  const fill = debug ? '#00ff00' : 'white';
+  const opacity = debug ? '0.35' : '0.03';
+  return `<g fill="${fill}" opacity="${opacity}">${ellipses.join('')}</g>`;
 }
 
-function renderRakeGroup(rake: RakePattern): string {
+function renderRakeGroup(rake: RakePattern, debugStroke?: string): string {
   if (rake.paths.length === 0) return '';
   const paths = rake.paths
     .map((d, i) => {
       const o = rake.opacities?.[i];
-      return o !== undefined && o < 1 ? `<path d="${d}" opacity="${o.toFixed(2)}"/>` : `<path d="${d}"/>`;
+      return o !== undefined && o < 1
+        ? `<path d="${d}" opacity="${o.toFixed(2)}"/>`
+        : `<path d="${d}"/>`;
     })
     .join('');
-  return `<g stroke="var(--rake-line)" stroke-width="1.1" stroke-linecap="round" fill="none" opacity="0.65">${paths}</g>`;
+  const stroke = debugStroke ?? 'var(--rake-line)';
+  const width = debugStroke ? '2' : '1.1';
+  const opacity = debugStroke ? '1' : '0.65';
+  return `<g stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" fill="none" opacity="${opacity}">${paths}</g>`;
 }
 
-function renderShadows(groups: readonly StoneGroup[]): string {
+function renderShadows(groups: readonly StoneGroup[], debugFill?: string): string {
   const ellipses: string[] = [];
   for (const group of groups) {
     for (const stone of group.stones) {
@@ -83,7 +104,8 @@ function renderShadows(groups: readonly StoneGroup[]): string {
     }
   }
   if (ellipses.length === 0) return '';
-  return `<g fill="var(--stone-shadow)" opacity="0.4">${ellipses.join('')}</g>`;
+  const fill = debugFill ?? 'var(--stone-shadow)';
+  return `<g fill="${fill}" opacity="0.4">${ellipses.join('')}</g>`;
 }
 
 /**

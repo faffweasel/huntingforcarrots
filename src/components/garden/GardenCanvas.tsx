@@ -20,12 +20,17 @@ function getResponsiveConfig(width: number): ResponsiveConfig {
   return { stoneTotals: [3, 5], rakeSpacing: { min: 14, max: 17 } };
 }
 
+function isDebugLayers(): boolean {
+  return window.location.hash.includes('debug=layers');
+}
+
 function buildSvg(seed: string): string {
   const mode = getMode();
   const config = getResponsiveConfig(window.innerWidth);
   const prng = createPrng(hashSeed(seed));
   const viewport = { width: window.innerWidth, height: window.innerHeight };
-  return renderGarden(compose(prng, mode, config, viewport));
+  const debug = isDebugLayers();
+  return renderGarden(compose(prng, mode, config, viewport, debug));
 }
 
 const CROSSFADE_MS = 300;

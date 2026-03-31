@@ -1,5 +1,6 @@
 import { pick, randomFloat, randomInt, shuffle } from '../prng';
 import {
+  type ExclusionPolygon,
   exclusionRadius,
   generateConcentricRake,
   generateMoss,
@@ -29,7 +30,8 @@ export function compose(
   prng: () => number,
   mode: CompositionMode,
   config?: ResponsiveConfig,
-  viewport?: { readonly width: number; readonly height: number }
+  viewport?: { readonly width: number; readonly height: number },
+  debugLayers?: boolean
 ): Composition {
   const viewBox = VIEWBOXES[mode];
   const stoneTotals = config?.stoneTotals ?? DEFAULT_STONE_TOTALS;
@@ -64,23 +66,43 @@ export function compose(
   const maxExpansions = computeMaxExpansions(stoneGroups);
 
   // --- Rake patterns ---
+  // Generate per-group ring data, then prune overlaps before merging.
+  const perGroupRings = stoneGroups.map((group, i) =>
+    generateConcentricRake(prng, group, maxExpansions[i])
+  );
+  pruneOverlappingRings(stoneGroups, perGroupRings);
+
+  // --- Debug logging (temporary) ---
+  if (debugLayers) {
+    for (let i = 0; i < stoneGroups.length; i++) {
+      const g = stoneGroups[i];
+      const r = perGroupRings[i];
+      console.log(
+        `[debug] group ${i}: centre=(${g.center.x.toFixed(1)}, ${g.center.y.toFixed(1)})` +
+          ` stones=${g.stones.length} boundingRadius=${g.boundingRadius.toFixed(1)}` +
+          ` ringCount=${r.paths.length}` +
+          ` outermostRadius=${r.radiusPerRing.length > 0 ? r.radiusPerRing[r.radiusPerRing.length - 1].toFixed(1) : 'none'}` +
+          ` radiusPerRing=[${r.radiusPerRing.map((v) => v.toFixed(1)).join(', ')}]`
+      );
+    }
+  }
+
+  // Merge pruned per-group data into a single RakePattern.
   const concentricPaths: string[] = [];
   const concentricOpacities: number[] = [];
-  const outermostRadii: number[] = [];
-  for (let i = 0; i < stoneGroups.length; i++) {
-    const result = generateConcentricRake(prng, stoneGroups[i], maxExpansions[i]);
-    concentricPaths.push(...result.paths);
-    concentricOpacities.push(...result.opacities);
-    outermostRadii.push(result.outermostRadius);
+  for (const rings of perGroupRings) {
+    concentricPaths.push(...rings.paths);
+    concentricOpacities.push(...rings.opacities);
   }
   const concentricRake: RakePattern = { paths: concentricPaths, opacities: concentricOpacities };
-  // Exclusion zones derived from actual outermost ring radius + 8px gap.
-  const exclusionZones = stoneGroups.map((g, i) => ({
-    cx: g.center.x,
-    cy: g.center.y,
-    radius: outermostRadii[i] + 8,
+
+  // Exclusion polygons from the outermost ring of each group — the 5px gap
+  // is applied inside the polygon clipper, so the shape matches exactly.
+  const exclusionPolygons: ExclusionPolygon[] = perGroupRings.map((rings) => ({
+    points:
+      rings.pointsPerRing.length > 0 ? rings.pointsPerRing[rings.pointsPerRing.length - 1] : [],
   }));
-  const parallelRake = generateParallelRake(prng, viewBox, rakeSpacing, exclusionZones);
+  const parallelRake = generateParallelRake(prng, viewBox, rakeSpacing, exclusionPolygons);
 
   // --- Moss (0–3 patches, each anchored to a different stone base) ---
   const allStones = stoneGroups.flatMap((g) => [...g.stones]);
@@ -106,6 +128,7 @@ export function compose(
     parallelRake,
     haikuArea,
     haikuPosition,
+    debugLayers,
   };
 }
 
@@ -269,6 +292,65 @@ function computeMaxExpansions(groups: readonly StoneGroup[]): number[] {
   }
 
   return expansions;
+}
+
+/**
+ * Post-generation overlap pruning. Checks every pair of groups — if
+ * the sum of their outermost ring radii exceeds the centre-to-centre
+ * distance, removes outermost rings from the SMALLER group until a
+ * minimum 20px gap exists between nearest rings of adjacent groups.
+ * Recomputes opacities after pruning so the new outermost ring fades correctly.
+ */
+function pruneOverlappingRings(
+  groups: readonly StoneGroup[],
+  rings: {
+    paths: string[];
+    opacities: number[];
+    radiusPerRing: number[];
+    outermostRadius: number;
+    pointsPerRing: Array<Array<{ x: number; y: number }>>;
+  }[]
+): void {
+  const MIN_GAP = 20;
+
+  for (let i = 0; i < groups.length; i++) {
+    for (let j = i + 1; j < groups.length; j++) {
+      const dx = groups[i].center.x - groups[j].center.x;
+      const dy = groups[i].center.y - groups[j].center.y;
+      const dist = Math.sqrt(dx ** 2 + dy ** 2);
+
+      // Determine which group is smaller (fewer stones = subordinate).
+      const smallerIdx = groups[i].stones.length <= groups[j].stones.length ? i : j;
+      const largerIdx = smallerIdx === i ? j : i;
+
+      // Remove outermost rings from smaller group until gap is sufficient.
+      // Floor at 2 rings — allow slight overlap rather than stripping a group bare.
+      while (rings[smallerIdx].radiusPerRing.length > 2) {
+        const radiusSmall =
+          rings[smallerIdx].radiusPerRing[rings[smallerIdx].radiusPerRing.length - 1];
+        const radiusLarge =
+          rings[largerIdx].radiusPerRing.length > 0
+            ? rings[largerIdx].radiusPerRing[rings[largerIdx].radiusPerRing.length - 1]
+            : 0;
+        const gap = dist - radiusSmall - radiusLarge;
+        if (gap >= MIN_GAP) break;
+
+        rings[smallerIdx].paths.pop();
+        rings[smallerIdx].opacities.pop();
+        rings[smallerIdx].radiusPerRing.pop();
+        rings[smallerIdx].pointsPerRing.pop();
+      }
+    }
+  }
+
+  // Recompute opacities: new outermost → 0.3, second-to-last → 0.6, rest → 1.0.
+  for (const ring of rings) {
+    const count = ring.opacities.length;
+    for (let k = 0; k < count; k++) {
+      const fromEnd = count - 1 - k;
+      ring.opacities[k] = fromEnd === 0 ? 0.3 : fromEnd === 1 ? 0.6 : 1.0;
+    }
+  }
 }
 
 /**

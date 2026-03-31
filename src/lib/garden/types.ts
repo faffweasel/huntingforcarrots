@@ -66,4 +66,6 @@ export interface Composition {
   readonly haikuArea: ViewBoxRect;
   /** Centre of the haiku area — convenience alias for positioning. */
   readonly haikuPosition: { readonly x: number; readonly y: number };
+  /** Temporary debug flag — colour-codes SVG layers and logs geometry. */
+  readonly debugLayers?: boolean;
 }

@@ -23,7 +23,7 @@ function getFocusable(container: HTMLElement): HTMLElement[] {
  * On deactivate: restores focus to the element that was active before activation.
  */
 export function useFocusTrap(
-  containerRef: RefObject<HTMLElement>,
+  containerRef: RefObject<HTMLElement | null>,
   isActive: boolean,
 ): void {
   const previousFocusRef = useRef<Element | null>(null)

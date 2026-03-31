@@ -14,7 +14,7 @@ export const menuSections: readonly MenuSection[] = [
   {
     items: [
       {
-        label: 'The Garden',
+        label: 'Garden',
         href: 'https://huntingforcarrots.com',
         external: true,
         status: 'active',
@@ -25,13 +25,6 @@ export const menuSections: readonly MenuSection[] = [
         external: true,
         status: 'active',
       },
-    ],
-  },
-  {
-    items: [
-      { label: 'Enough', href: '', external: false, status: 'coming-soon' },
-      { label: 'Hourglass', href: '', external: false, status: 'coming-soon' },
-      { label: 'Sunk Cost', href: '', external: false, status: 'coming-soon' },
     ],
   },
   {

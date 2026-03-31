@@ -2,16 +2,13 @@ import { createRoute } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { GardenCanvas } from '../components/garden/GardenCanvas';
-import { RegenerateButton } from '../components/garden/RegenerateButton';
 import { rootRoute } from './root';
 
-function getSeed(): string {
+/** Reads the seed from the URL hash, or uses today's date. */
+function readSeed(): string {
   const match = window.location.hash.match(/^#s=([^&]+)/);
   if (match) return match[1];
-
-  const seed = Date.now().toString(16);
-  writeSeedToHash(seed);
-  return seed;
+  return new Date().toISOString().slice(0, 10);
 }
 
 function writeSeedToHash(seed: string): void {
@@ -19,28 +16,26 @@ function writeSeedToHash(seed: string): void {
 }
 
 function GardenPage(): ReactElement {
-  const [seed, setSeed] = useState(getSeed);
+  const [seed] = useState(readSeed);
 
+  // Write the seed to the URL hash so the link is shareable.
+  useEffect(() => {
+    if (!window.location.hash.match(/^#s=/)) {
+      writeSeedToHash(seed);
+    }
+  }, [seed]);
+
+  // Honour external hash changes (e.g. shared links pasted in).
+  const [liveSeed, setLiveSeed] = useState(seed);
   useEffect(() => {
     function handleHashChange() {
-      setSeed(getSeed());
+      setLiveSeed(readSeed());
     }
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  function handleRegenerate() {
-    const newSeed = Math.random().toString(16).slice(2, 8);
-    writeSeedToHash(newSeed);
-    setSeed(newSeed);
-  }
-
-  return (
-    <>
-      <GardenCanvas seed={seed} />
-      <RegenerateButton onRegenerate={handleRegenerate} />
-    </>
-  );
+  return <GardenCanvas seed={liveSeed} />;
 }
 
 export const indexRoute = createRoute({

@@ -31,7 +31,8 @@ export function compose(
   mode: CompositionMode,
   config?: ResponsiveConfig,
   viewport?: { readonly width: number; readonly height: number },
-  debugLayers?: boolean
+  debugLayers?: boolean,
+  debugVerbose?: boolean
 ): Composition {
   const viewBox = VIEWBOXES[mode];
   const stoneTotals = config?.stoneTotals ?? DEFAULT_STONE_TOTALS;
@@ -72,8 +73,8 @@ export function compose(
   );
   pruneOverlappingRings(stoneGroups, perGroupRings);
 
-  // --- Debug logging (temporary) ---
-  if (debugLayers) {
+  // --- Debug logging (#debug=verbose) ---
+  if (debugVerbose) {
     for (let i = 0; i < stoneGroups.length; i++) {
       const g = stoneGroups[i];
       const r = perGroupRings[i];
@@ -129,6 +130,7 @@ export function compose(
     haikuArea,
     haikuPosition,
     debugLayers,
+    debugVerbose,
   };
 }
 
@@ -417,10 +419,6 @@ function clampGroupsToViewport(
     }
 
     if (dy === 0) continue;
-
-    console.warn(
-      `[garden] group ${i} shifted by ${dy.toFixed(1)}px to stay within viewport (minY=${minY.toFixed(1)}, maxY=${maxY.toFixed(1)})`
-    );
 
     groups[i] = {
       stones: group.stones.map((stone) => ({

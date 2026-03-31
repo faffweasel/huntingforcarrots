@@ -1,5 +1,14 @@
 export type StonePosture = 'taido' | 'reisho' | 'shigyo' | 'shintai' | 'kikyaku';
 
+export interface ColourShift {
+  /** Brightness multiplier offset. Dominant: -0.12 to -0.04; companion: +0.02 to +0.10. */
+  readonly lightness: number;
+  /** Hue rotation in degrees (±8). Positive = warmer (brown), negative = cooler (grey). */
+  readonly hue: number;
+  /** Saturation multiplier (0.9–1.1). */
+  readonly saturation: number;
+}
+
 export interface Stone {
   readonly x: number;
   readonly y: number;
@@ -7,8 +16,8 @@ export interface Stone {
   readonly height: number;
   /** Subtle rotation in degrees — range -10° to 10°. */
   readonly rotation: number;
-  /** Lightness shift applied to the stone colour — range -0.05 to 0.05. */
-  readonly colourVariation: number;
+  /** Per-stone tonal variation from the base --stone colour. */
+  readonly colourShift: ColourShift;
   /** SVG path data for the perturbed stone shape. */
   readonly path: string;
   readonly posture: StonePosture;
@@ -66,6 +75,8 @@ export interface Composition {
   readonly haikuArea: ViewBoxRect;
   /** Centre of the haiku area — convenience alias for positioning. */
   readonly haikuPosition: { readonly x: number; readonly y: number };
-  /** Temporary debug flag — colour-codes SVG layers and logs geometry. */
+  /** Colour-codes SVG layers when #debug=layers is in the URL hash. */
   readonly debugLayers?: boolean;
+  /** Enables console output for geometry diagnostics when #debug=verbose. */
+  readonly debugVerbose?: boolean;
 }

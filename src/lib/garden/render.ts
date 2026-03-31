@@ -22,16 +22,18 @@ function n(value: number): string {
  * No <text> elements — haiku is rendered as HTML over the SVG.
  */
 export function renderGarden(composition: Composition): string {
-  const { viewBox, stoneGroups, moss, concentricRake, parallelRake, debugLayers } = composition;
+  const { viewBox, stoneGroups, moss, concentricRake, parallelRake, debugLayers, debugVerbose } =
+    composition;
   const vb = `0 0 ${viewBox.width} ${viewBox.height}`;
   const label = buildAriaLabel(composition);
   const debug = debugLayers === true;
+  const verbose = debugVerbose === true;
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${label}">`,
     `<rect width="${viewBox.width}" height="${viewBox.height}" fill="var(--sand)"/>`,
     renderRakeGroup(parallelRake, debug ? '#ff0000' : undefined),
-    renderIslands(stoneGroups, debug),
+    renderIslands(stoneGroups, debug, verbose),
     renderRakeGroup(concentricRake, debug ? '#0000ff' : undefined),
     renderShadows(stoneGroups, debug ? '#ffff00' : undefined),
     renderStones(stoneGroups, viewBox.height),
@@ -43,7 +45,7 @@ export function renderGarden(composition: Composition): string {
 // ─── Layer renderers ──────────────────────────────────────────────────────────
 
 /** Subtle mound effect behind each stone group — barely visible lightening of the sand. */
-function renderIslands(groups: readonly StoneGroup[], debug?: boolean): string {
+function renderIslands(groups: readonly StoneGroup[], debug?: boolean, verbose?: boolean): string {
   if (groups.length === 0) return '';
   const ISLAND_PADDING = 5;
   const ellipses: string[] = [];
@@ -60,13 +62,11 @@ function renderIslands(groups: readonly StoneGroup[], debug?: boolean): string {
     const rx = maxExtentX + ISLAND_PADDING;
     const ry = maxExtentY * 0.4 + ISLAND_PADDING;
 
-    if (debug) {
+    if (verbose) {
       console.log(
         `[debug] island ${idx}: cx=${n(group.center.x)} cy=${n(group.center.y)}` +
           ` rx=${n(rx)} ry=${n(ry)}` +
-          ` fill=white opacity=0.03` +
-          ` maxExtentX=${n(maxExtentX)} maxExtentY=${n(maxExtentY)}` +
-          ` svgElementIndex=3 (after sand + parallel rake)`
+          ` maxExtentX=${n(maxExtentX)} maxExtentY=${n(maxExtentY)}`
       );
     }
 
@@ -109,21 +109,25 @@ function renderShadows(groups: readonly StoneGroup[], debugFill?: string): strin
 }
 
 /**
- * Renders stone paths with two visual modifiers:
+ * Renders stone paths with per-stone tonal variation:
  *
  * - Depth-cue opacity: 0.85 (top of viewport) → 1.0 (bottom).
  *   Far stones appear slightly muted as the sand shows through.
- * - Per-stone brightness: 1 + colourVariation (±5%).
- *   Gives subtle individuality to each stone.
+ * - Per-stone colour shift via CSS filters:
+ *   brightness (±8-12%), hue-rotate (±8°), saturate (0.9–1.1×).
+ *   Dominant stones are darker, companions lighter. Hue shifts add
+ *   warmth/coolness variation within the group.
  */
 function renderStones(groups: readonly StoneGroup[], viewBoxHeight: number): string {
   const paths: string[] = [];
   for (const group of groups) {
     for (const stone of group.stones) {
       const depthOpacity = Math.min(1, Math.max(0.85, 0.85 + (stone.y / viewBoxHeight) * 0.15));
-      const brightness = 1 + stone.colourVariation;
+      const { lightness, hue, saturation } = stone.colourShift;
+      const brightness = 1 + lightness;
+      const filter = `brightness(${n(brightness)}) hue-rotate(${n(hue)}deg) saturate(${n(saturation)})`;
       paths.push(
-        `<path d="${stone.path}" opacity="${n(depthOpacity)}" style="filter:brightness(${n(brightness)})"/>`
+        `<path d="${stone.path}" opacity="${n(depthOpacity)}" style="filter:${filter}"/>`
       );
     }
   }

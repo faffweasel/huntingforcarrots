@@ -1,5 +1,5 @@
 import { randomFloat, randomInt } from '../prng';
-import type { MossPatch, RakePattern, Stone, StoneGroup, StonePosture } from './types';
+import type { ColourShift, MossPatch, RakePattern, Stone, StoneGroup, StonePosture } from './types';
 
 // 24 sample points → 15° intervals around the ellipse perimeter.
 const POINT_COUNT = 24;
@@ -21,6 +21,8 @@ export interface StoneParams {
   readonly lowerHalfBoost?: number;
   /** Posture tag included in the output Stone. Defaults to 'shintai'. */
   readonly posture?: StonePosture;
+  /** Dominant stones get darker tones; companions get lighter. */
+  readonly isDominant?: boolean;
 }
 
 /** Shadow ellipse params for rendering behind a stone. */
@@ -52,7 +54,7 @@ export function generateStone(prng: () => number, params: StoneParams): Stone {
 
   const { min: rotMin, max: rotMax } = params.rotationRange ?? { min: -10, max: 10 };
   const rotation = randomFloat(prng, rotMin, rotMax);
-  const colourVariation = randomFloat(prng, -0.05, 0.05);
+  const colourShift = generateColourShift(prng, params.isDominant ?? false);
   const { min: pertMin, max: pertMax } = params.perturbation ?? { min: 0.05, max: 0.15 };
   const lowerBoost = params.lowerHalfBoost ?? 0;
 
@@ -94,10 +96,26 @@ export function generateStone(prng: () => number, params: StoneParams): Stone {
     width: w,
     height: h,
     rotation,
-    colourVariation,
+    colourShift,
     path: buildSmoothClosedPath(points),
     posture: params.posture ?? 'shintai',
   };
+}
+
+/**
+ * Generates per-stone tonal variation from the PRNG.
+ *
+ * Dominant stones skew darker (they anchor the group visually).
+ * Companion stones skew lighter (they recede). Hue and saturation
+ * shifts add warmth/coolness variation — same quarry, different stones.
+ */
+function generateColourShift(prng: () => number, isDominant: boolean): ColourShift {
+  const lightness = isDominant
+    ? randomFloat(prng, -0.12, -0.04)
+    : randomFloat(prng, 0.02, 0.10);
+  const hue = randomFloat(prng, -8, 8);
+  const saturation = randomFloat(prng, 0.9, 1.1);
+  return { lightness, hue, saturation };
 }
 
 /**

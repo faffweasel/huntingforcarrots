@@ -228,6 +228,7 @@ function placeStone(
     perturbation: profile.perturbation,
     lowerHalfBoost: isDominant ? 0.05 : 0,
     posture,
+    isDominant,
   });
 }
 

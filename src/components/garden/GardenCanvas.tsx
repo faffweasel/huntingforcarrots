@@ -20,71 +20,33 @@ function getResponsiveConfig(width: number): ResponsiveConfig {
   return { stoneTotals: [3, 5], rakeSpacing: { min: 14, max: 17 } };
 }
 
-function isDebugLayers(): boolean {
-  return window.location.hash.includes('debug=layers');
-}
-
 function buildSvg(seed: string): string {
   const mode = getMode();
   const config = getResponsiveConfig(window.innerWidth);
   const prng = createPrng(hashSeed(seed));
   const viewport = { width: window.innerWidth, height: window.innerHeight };
-  const debug = isDebugLayers();
-  return renderGarden(compose(prng, mode, config, viewport, debug));
+  const hash = window.location.hash;
+  const debugLayers = hash.includes('debug=layers');
+  const debugVerbose = hash.includes('debug=verbose');
+  return renderGarden(compose(prng, mode, config, viewport, debugLayers, debugVerbose));
 }
-
-const CROSSFADE_MS = 300;
-const reducedMotion =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Full-viewport generative zen garden. Reads seed from props,
  * composes deterministically, and renders as a single SVG background.
  *
- * Re-composes on seed change (with crossfade) and when the viewport
- * crosses the landscape/portrait boundary (instant, debounced).
+ * Re-composes when the viewport crosses the landscape/portrait boundary
+ * (instant, debounced 200ms).
  */
 export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
-  const [currentSvg, setCurrentSvg] = useState('');
-  const [previousSvg, setPreviousSvg] = useState('');
-  const [fadeIn, setFadeIn] = useState(true);
-  const mountedRef = useRef(false);
-  const currentSvgRef = useRef('');
+  const [svg, setSvg] = useState(() => buildSvg(seed));
+  const svgRef = useRef(svg);
 
-  // Compose on seed change, crossfade if not first render.
+  // Re-compose when seed changes.
   useEffect(() => {
-    const svg = buildSvg(seed);
-
-    if (!mountedRef.current) {
-      currentSvgRef.current = svg;
-      setCurrentSvg(svg);
-      mountedRef.current = true;
-      return;
-    }
-
-    if (reducedMotion) {
-      currentSvgRef.current = svg;
-      setCurrentSvg(svg);
-      return;
-    }
-
-    // Crossfade: show old behind, fade in new over 300ms.
-    setPreviousSvg(currentSvgRef.current);
-    currentSvgRef.current = svg;
-    setCurrentSvg(svg);
-    setFadeIn(false);
-
-    // Double rAF ensures the browser paints opacity:0 before transitioning.
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setFadeIn(true));
-    });
-
-    const timer = setTimeout(() => setPreviousSvg(''), CROSSFADE_MS + 50);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timer);
-    };
+    const next = buildSvg(seed);
+    svgRef.current = next;
+    setSvg(next);
   }, [seed]);
 
   // Re-compose when aspect-ratio class flips (landscape <-> portrait).
@@ -98,9 +60,9 @@ export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
         const newMode = getMode();
         if (newMode !== currentMode) {
           currentMode = newMode;
-          const svg = buildSvg(seed);
-          currentSvgRef.current = svg;
-          setCurrentSvg(svg);
+          const next = buildSvg(seed);
+          svgRef.current = next;
+          setSvg(next);
         }
       }, 200);
     }
@@ -112,26 +74,13 @@ export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
     };
   }, [seed]);
 
-  if (!currentSvg) return <div className="fixed inset-0 -z-10" />;
+  if (!svg) return <div className="fixed inset-0 -z-10" />;
 
   return (
-    <>
-      {previousSvg && (
-        <div
-          className="fixed inset-0 -z-10"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
-          dangerouslySetInnerHTML={{ __html: previousSvg }}
-        />
-      )}
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          opacity: fadeIn ? 1 : 0,
-          transition: fadeIn ? `opacity ${CROSSFADE_MS}ms ease` : 'none',
-        }}
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
-        dangerouslySetInnerHTML={{ __html: currentSvg }}
-      />
-    </>
+    <div
+      className="fixed inset-0 -z-10"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
   );
 }

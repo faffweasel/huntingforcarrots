@@ -28,12 +28,16 @@ describe('generateStone', () => {
     }
   });
 
-  it('colourVariation is within -0.05 to 0.05', () => {
+  it('colourShift fields are within expected ranges (companion stone)', () => {
     const prng = createPrng(456);
     for (let i = 0; i < 50; i++) {
       const stone = generateStone(prng, BASE_PARAMS);
-      expect(stone.colourVariation).toBeGreaterThanOrEqual(-0.05);
-      expect(stone.colourVariation).toBeLessThanOrEqual(0.05);
+      expect(stone.colourShift.lightness).toBeGreaterThanOrEqual(0.02);
+      expect(stone.colourShift.lightness).toBeLessThanOrEqual(0.1);
+      expect(stone.colourShift.hue).toBeGreaterThanOrEqual(-8);
+      expect(stone.colourShift.hue).toBeLessThanOrEqual(8);
+      expect(stone.colourShift.saturation).toBeGreaterThanOrEqual(0.9);
+      expect(stone.colourShift.saturation).toBeLessThanOrEqual(1.1);
     }
   });
 

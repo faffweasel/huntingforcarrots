@@ -142,9 +142,8 @@ function NavItem({ item, currentPath, onClose, isFooter }: NavItemProps): ReactE
   return (
     <li className="flex items-center">
       {dot}
-      <a href={item.href} target="_blank" rel="noreferrer" onClick={onClose} className={linkClass}>
+      <a href={item.href} onClick={onClose} className={linkClass}>
         {item.label}
-        <span className="sr-only">(opens in new tab)</span>
       </a>
     </li>
   );

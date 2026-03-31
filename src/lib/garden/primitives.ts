@@ -183,7 +183,7 @@ export function generateConcentricRake(
   readonly pointsPerRing: Array<Array<{ x: number; y: number }>>;
 } {
   // Compute island ellipse (must match renderIslands in render.ts).
-  const ISLAND_PADDING = 8;
+  const ISLAND_PADDING = 5;
   let maxExtentX = 0;
   let maxExtentY = 0;
   for (const stone of stoneGroup.stones) {

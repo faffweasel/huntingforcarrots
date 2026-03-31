@@ -45,7 +45,7 @@ export function renderGarden(composition: Composition): string {
 /** Subtle mound effect behind each stone group — barely visible lightening of the sand. */
 function renderIslands(groups: readonly StoneGroup[], debug?: boolean): string {
   if (groups.length === 0) return '';
-  const ISLAND_PADDING = 8;
+  const ISLAND_PADDING = 5;
   const ellipses: string[] = [];
   for (let idx = 0; idx < groups.length; idx++) {
     const group = groups[idx];

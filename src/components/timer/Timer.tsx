@@ -684,6 +684,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   height={ICON_SIZE}
                   viewBox={`0 0 ${ICON_SIZE} ${ICON_SIZE}`}
                   aria-hidden="true"
+                  style={pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
                 >
                   <circle cx={ICON_HALF} cy={ICON_HALF} r={ICON_R} fill="currentColor" />
                 </svg>
@@ -707,6 +708,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
             viewBox={`0 0 ${ICON_SIZE} ${ICON_SIZE}`}
             fill="none"
             aria-hidden="true"
+            style={pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
           >
             {/* Track ring */}
             <circle
@@ -737,7 +739,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
           {isActive && (
             <span
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 200,
                 fontVariantNumeric: 'tabular-nums',
                 color: 'var(--muted)',

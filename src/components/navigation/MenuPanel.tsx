@@ -162,7 +162,7 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
       // Falsy branch uses undefined so the attribute is absent (not false).
       inert={!isOpen || undefined}
       className={[
-        'fixed inset-y-0 left-0 z-20',
+        'fixed inset-y-0 left-0 z-20 overflow-visible',
         // Width: 80vw on mobile (max 320px), fixed 280px on desktop
         'w-[80vw] max-w-[320px] md:w-[280px] md:max-w-none',
         // Slide in from left — reduced-motion rule in index.css zeroes duration
@@ -249,7 +249,7 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
               className={isFooterSection ? 'mt-auto' : sectionIndex > 0 ? 'mt-8' : ''}
             >
               {section.heading !== undefined && (
-                <p className="text-[11px] font-light uppercase [letter-spacing:0.12em] [color:var(--muted)] mb-3">
+                <p className="text-[11px] font-light [letter-spacing:0.12em] [color:var(--muted)] mb-3">
                   {section.heading}
                 </p>
               )}

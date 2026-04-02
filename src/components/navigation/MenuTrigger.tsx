@@ -32,7 +32,7 @@ export function MenuTrigger({ isOpen, onClick }: Props): ReactElement {
         className="relative"
       >
         {/* Three horizontal bars — hamburger */}
-        <g style={{ opacity: isOpen ? 0 : 1, transition: 'opacity 0.15s ease' }}>
+        <g className="transition-opacity duration-150" style={{ opacity: isOpen ? 0 : 1 }}>
           <line
             x1="4"
             y1="7"
@@ -62,7 +62,7 @@ export function MenuTrigger({ isOpen, onClick }: Props): ReactElement {
           />
         </g>
         {/* Two diagonal lines — close × */}
-        <g style={{ opacity: isOpen ? 1 : 0, transition: 'opacity 0.15s ease' }}>
+        <g className="transition-opacity duration-150" style={{ opacity: isOpen ? 1 : 0 }}>
           <line
             x1="6"
             y1="6"

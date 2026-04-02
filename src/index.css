@@ -8,7 +8,7 @@
 
   /* Text */
   --text: #3a3530;
-  --muted: #746c62;
+  --muted: #746c62; /* fails AA on --sand (3.95:1). Use --text on sand backgrounds. */
 
   /* Interactive */
   --interactive: #586947;
@@ -41,7 +41,7 @@
   --bg: #1a1d24;
   --surface: #242830;
   --text: #d4d0cc;
-  --muted: #8a8d94;
+  --muted: #8e9198;
   --interactive: #8a9c7a;
   --interactive-visited: #6b7a5d;
   --focus-ring: #8a9c7a;

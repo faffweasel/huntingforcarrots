@@ -39,9 +39,12 @@ function buildScene(seed: string): Scene {
   const debugLayers = hash.includes('debug=layers');
   const debugVerbose = hash.includes('debug=verbose');
   // Order matters: garden consumes PRNG values first, then haiku consumes the next ones.
+  const t0 = performance.now();
   const composition = compose(prng, mode, config, viewport, debugLayers, debugVerbose);
   const svg = renderGarden(composition);
   const haiku = generateHaiku(prng, seed);
+  const t1 = performance.now();
+  if (import.meta.env.DEV) console.log(`Garden + haiku generation: ${(t1 - t0).toFixed(1)}ms`);
   return { svg, haiku, haikuPosition: composition.haikuPosition, viewBox: composition.viewBox };
 }
 

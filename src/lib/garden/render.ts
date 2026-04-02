@@ -25,12 +25,11 @@ export function renderGarden(composition: Composition): string {
   const { viewBox, stoneGroups, moss, concentricRake, parallelRake, debugLayers, debugVerbose } =
     composition;
   const vb = `0 0 ${viewBox.width} ${viewBox.height}`;
-  const label = buildAriaLabel(composition);
   const debug = debugLayers === true;
   const verbose = debugVerbose === true;
 
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${label}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">`,
     `<rect width="${viewBox.width}" height="${viewBox.height}" fill="var(--sand)"/>`,
     renderRakeGroup(parallelRake, debug ? '#ff0000' : undefined),
     renderIslands(stoneGroups, debug, verbose),
@@ -147,7 +146,7 @@ function renderMossPatches(patches: readonly MossPatch[]): string {
 
 // ─── Accessibility ────────────────────────────────────────────────────────────
 
-function buildAriaLabel(composition: Composition): string {
+export function buildAriaLabel(composition: Composition): string {
   const totalStones = composition.stoneGroups.reduce((sum, g) => sum + g.stones.length, 0);
   const groupCount = composition.stoneGroups.length;
   const mossCount = composition.moss.length;

@@ -352,32 +352,41 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   }
 
   // ── Countdown tick ─────────────────────────────────────────────────────
+  // Uses recursive setTimeout so each tick explicitly schedules the next.
+  // When the timer completes, no next tick is scheduled — structurally
+  // impossible to fire the completion bell more than once.
+
+  const remainingRef = useRef(0);
 
   useEffect(() => {
     if (!running) return;
-    intervalRef.current = setInterval(() => {
-      setRemaining((prev) => {
-        const next = prev - 1;
-        if (next <= 0) {
-          clearInterval(intervalRef.current);
-          setRunning(false);
-          setPaused(false);
-          setLiveText('Timer complete');
-          if (audioCtxRef.current && bellsRef.current) {
-            strikeBell(audioCtxRef.current, bellsRef.current.complete);
-          }
-          setPulsing(true);
-          pulseRef.current = setTimeout(() => setPulsing(false), 2000);
-          posRef.current = durationRef.current;
-          setPos(durationRef.current);
-          return 0;
+
+    function tick() {
+      const next = remainingRef.current - 1;
+      remainingRef.current = next;
+      if (next <= 0) {
+        remainingRef.current = 0;
+        if (audioCtxRef.current && bellsRef.current) {
+          strikeBell(audioCtxRef.current, bellsRef.current.complete);
         }
+        setPulsing(true);
+        pulseRef.current = setTimeout(() => setPulsing(false), 2000);
+        setRemaining(0);
+        setRunning(false);
+        setPaused(false);
+        setLiveText('Timer complete');
+        posRef.current = durationRef.current;
+        setPos(durationRef.current);
+      } else {
+        setRemaining(next);
         const text = announcement(next);
         if (text) setLiveText(text);
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(intervalRef.current);
+        intervalRef.current = setTimeout(tick, 1000);
+      }
+    }
+
+    intervalRef.current = setTimeout(tick, 1000);
+    return () => clearTimeout(intervalRef.current);
   }, [running]);
 
   useEffect(() => () => clearTimeout(pulseRef.current), []);
@@ -398,22 +407,27 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
   // ── Actions ────────────────────────────────────────────────────────────
 
-  async function handleStart() {
-    await ensureAudio();
+  function handleStart() {
     const d = durationRef.current;
     const total = d * 60;
     totalRef.current = total;
+    remainingRef.current = total;
     setRemaining(total);
     setRunning(true);
     setPaused(false);
     setLiveText(`${d} ${d === 1 ? 'minute' : 'minutes'} remaining`);
-    if (audioCtxRef.current && bellsRef.current) {
-      strikeBell(audioCtxRef.current, bellsRef.current.begin);
-    }
+    // Fire-and-forget: ensureAudio resolves the AudioContext (created on this
+    // user gesture) then strikes the bell.  State updates above are synchronous
+    // so React removes the Start button before a second click can land.
+    void ensureAudio().then(() => {
+      if (audioCtxRef.current && bellsRef.current) {
+        strikeBell(audioCtxRef.current, bellsRef.current.begin);
+      }
+    });
   }
 
   function handlePause() {
-    clearInterval(intervalRef.current);
+    clearTimeout(intervalRef.current);
     setRunning(false);
     setPaused(true);
   }
@@ -424,9 +438,10 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   }
 
   function handleReset() {
-    clearInterval(intervalRef.current);
+    clearTimeout(intervalRef.current);
     setRunning(false);
     setPaused(false);
+    remainingRef.current = 0;
     setRemaining(0);
     setLiveText('');
     posRef.current = durationRef.current;

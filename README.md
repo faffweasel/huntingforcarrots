@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# Hunting for Carrots
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A generative zen garden. Each day creates a unique karesansui and haiku. No tracking, no accounts, no data collected.
 
-Currently, two official plugins are available:
+**https://huntingforcarrots.com**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it is
 
-## React Compiler
+A procedurally generated dry landscape garden rendered as SVG, with a haiku assembled from curated fragment banks. The garden changes daily — everyone sees the same composition on the same day. A meditation timer with singing bowl audio sits quietly in the corner if you want it.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Everything runs client-side. Nothing leaves your browser.
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+React, TypeScript, Vite, Tailwind CSS v4. Hosted on Bunny.net. No backend, no database, no analytics.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Other commands:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build       # Production build
+npm run preview     # Preview production build locally
+npm run check       # Biome lint + format check
+npm run test        # Vitest
 ```
+
+## How the garden works
+
+A seeded PRNG generates the garden composition — stone placement, rake patterns, moss patches — then selects a haiku from fragment banks using semantic clustering and seasonal weighting. The same seed always produces the same garden and haiku.
+
+The daily seed is today's date. Sharing the URL (which includes the seed as a hash fragment) shares the exact garden.
+
+Between 8pm and 6am local time, the garden shifts to dusk mode — cool sky, warm earth.
+
+## Licence
+
+All code in this repository is licensed under the AGPL-3.0
+**unless a directory contains a LICENCE or LICENCE.md file**,
+in which case that file applies to the code in that subdirectory.
+
+---
+
+Copyright © 2026 Phill Richardson
+https://www.faffweasel.com

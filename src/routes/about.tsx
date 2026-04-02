@@ -11,7 +11,7 @@ function AboutPage(): ReactElement {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        padding: 'var(--space-2xl) 24px 48px',
+        padding: 'var(--space-2xl) 24px var(--space-xl)',
       }}
     >
       <div style={{ maxWidth: 640, width: '100%' }}>
@@ -19,7 +19,7 @@ function AboutPage(): ReactElement {
           style={{
             fontWeight: 300,
             fontSize: 24,
-            letterSpacing: '0.12em',
+            letterSpacing: '0.15em',
             color: 'var(--muted)',
             marginTop: 0,
             marginBottom: 'var(--space-xl)',

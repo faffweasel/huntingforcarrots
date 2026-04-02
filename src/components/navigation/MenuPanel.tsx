@@ -245,11 +245,11 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
           const isFooterSection = sectionIndex === sections.length - 1;
           return (
             <div
-              key={sectionIndex}
+              key={section.heading ?? section.items[0]?.label}
               className={isFooterSection ? 'mt-auto' : sectionIndex > 0 ? 'mt-8' : ''}
             >
               {section.heading !== undefined && (
-                <p className="text-[11px] font-light [letter-spacing:0.12em] [color:var(--muted)] mb-3">
+                <p className="text-[13px] font-light [letter-spacing:0.12em] [color:var(--muted)] mb-3">
                   {section.heading}
                 </p>
               )}

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { compose } from '../../lib/garden/compose';
-import { renderGarden } from '../../lib/garden/render';
+import { buildAriaLabel, renderGarden } from '../../lib/garden/render';
 import type { CompositionMode, ResponsiveConfig } from '../../lib/garden/types';
 import type { Haiku } from '../../lib/haiku';
 import { generateHaiku } from '../../lib/haiku';
@@ -25,6 +25,7 @@ function getResponsiveConfig(width: number): ResponsiveConfig {
 
 interface Scene {
   readonly svg: string;
+  readonly ariaLabel: string;
   readonly haiku: Haiku;
   readonly haikuPosition: { readonly x: number; readonly y: number };
   readonly viewBox: { readonly width: number; readonly height: number };
@@ -42,10 +43,17 @@ function buildScene(seed: string): Scene {
   const t0 = performance.now();
   const composition = compose(prng, mode, config, viewport, debugLayers, debugVerbose);
   const svg = renderGarden(composition);
+  const ariaLabel = buildAriaLabel(composition);
   const haiku = generateHaiku(prng, seed);
   const t1 = performance.now();
   if (import.meta.env.DEV) console.log(`Garden + haiku generation: ${(t1 - t0).toFixed(1)}ms`);
-  return { svg, haiku, haikuPosition: composition.haikuPosition, viewBox: composition.viewBox };
+  return {
+    svg,
+    ariaLabel,
+    haiku,
+    haikuPosition: composition.haikuPosition,
+    viewBox: composition.viewBox,
+  };
 }
 
 /**
@@ -97,6 +105,8 @@ export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
     <>
       <div
         className="fixed inset-0 -z-10"
+        role="img"
+        aria-label={scene.ariaLabel}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
         dangerouslySetInnerHTML={{ __html: scene.svg }}
       />

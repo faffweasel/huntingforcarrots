@@ -7,15 +7,17 @@ interface HaikuOverlayProps {
   readonly viewBox: { readonly width: number; readonly height: number };
 }
 
-// Nav icon: top-6 left-6 (24px), 44px size. Timer: bottom-6 right-6 (24px), 44px size.
-// 24 + 44 + 32px breathing room = 100px clearance from each corner.
-const CONTROL_CLEARANCE = 100;
-const EDGE_PAD = 32;
+// Minimum clearance from viewport edges (pixels).
+// Top/bottom 80px clears nav trigger and timer; left 48px; right 80px clears timer icon.
+const PAD_TOP = 80;
+const PAD_BOTTOM = 80;
+const PAD_LEFT = 48;
+const PAD_RIGHT = 80;
 
 // Conservative text block half-dimensions for clamping.
 // Covers the largest breakpoint (20px font, line-height 2.0, 3 lines ≈ 120px tall, ~280px wide).
 const TEXT_HALF_W = 140;
-const TEXT_HALF_H = 65;
+const TEXT_HALF_H = 60;
 
 /**
  * Converts a viewBox coordinate to viewport pixels,
@@ -39,28 +41,29 @@ function toViewportPixels(
 }
 
 /**
- * Clamps the haiku center to keep the full text block within the viewport
- * with 32px breathing room, and clear of nav (top-left) and timer (bottom-right).
- * Safety check only — the composition engine handles primary placement.
+ * Clamps the haiku centre so the full text block stays within safe bounds:
+ *   top ≥ PAD_TOP, bottom ≤ vpH − PAD_BOTTOM,
+ *   left ≥ PAD_LEFT, right ≤ vpW − PAD_RIGHT.
+ * Falls back to viewport centre if the safe zone is too small (tiny viewport).
  */
 function clampCenter(cx: number, cy: number): { x: number; y: number } {
   const vpW = window.innerWidth;
   const vpH = window.innerHeight;
 
-  const x = Math.max(TEXT_HALF_W + EDGE_PAD, Math.min(vpW - TEXT_HALF_W - EDGE_PAD, cx));
-  let y = Math.max(TEXT_HALF_H + EDGE_PAD, Math.min(vpH - TEXT_HALF_H - EDGE_PAD, cy));
+  const minX = PAD_LEFT + TEXT_HALF_W;
+  const maxX = vpW - PAD_RIGHT - TEXT_HALF_W;
+  const minY = PAD_TOP + TEXT_HALF_H;
+  const maxY = vpH - PAD_BOTTOM - TEXT_HALF_H;
 
-  // Nav icon (top-left): nudge down if text block would overlap
-  if (x - TEXT_HALF_W < CONTROL_CLEARANCE && y - TEXT_HALF_H < CONTROL_CLEARANCE) {
-    y = CONTROL_CLEARANCE + TEXT_HALF_H;
+  // Viewport too small for any valid position — centre as best we can.
+  if (minX > maxX || minY > maxY) {
+    return { x: vpW / 2, y: vpH / 2 };
   }
 
-  // Timer icon (bottom-right): nudge up if text block would overlap
-  if (x + TEXT_HALF_W > vpW - CONTROL_CLEARANCE && y + TEXT_HALF_H > vpH - CONTROL_CLEARANCE) {
-    y = vpH - CONTROL_CLEARANCE - TEXT_HALF_H;
-  }
-
-  return { x, y };
+  return {
+    x: Math.max(minX, Math.min(maxX, cx)),
+    y: Math.max(minY, Math.min(maxY, cy)),
+  };
 }
 
 export function HaikuOverlay({ haiku, position, viewBox }: HaikuOverlayProps): ReactElement {

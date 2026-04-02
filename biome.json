@@ -7,7 +7,7 @@
       "recommended": true,
       "correctness": { "useExhaustiveDependencies": "warn" },
       "suspicious": { "noExplicitAny": "warn" },
-      "complexity": { "noImportantStyles": "off"}
+      "complexity": { "noImportantStyles": "off" }
     }
   },
   "formatter": {

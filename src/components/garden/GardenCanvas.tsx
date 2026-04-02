@@ -3,8 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { compose } from '../../lib/garden/compose';
 import { renderGarden } from '../../lib/garden/render';
 import type { CompositionMode, ResponsiveConfig } from '../../lib/garden/types';
+import type { Haiku } from '../../lib/haiku';
+import { generateHaiku } from '../../lib/haiku';
 import { createPrng } from '../../lib/prng';
 import { hashSeed } from '../../lib/seed';
+import { HaikuOverlay } from './HaikuOverlay';
 
 interface GardenCanvasProps {
   readonly seed: string;
@@ -20,7 +23,14 @@ function getResponsiveConfig(width: number): ResponsiveConfig {
   return { stoneTotals: [3, 5], rakeSpacing: { min: 14, max: 17 } };
 }
 
-function buildSvg(seed: string): string {
+interface Scene {
+  readonly svg: string;
+  readonly haiku: Haiku;
+  readonly haikuPosition: { readonly x: number; readonly y: number };
+  readonly viewBox: { readonly width: number; readonly height: number };
+}
+
+function buildScene(seed: string): Scene {
   const mode = getMode();
   const config = getResponsiveConfig(window.innerWidth);
   const prng = createPrng(hashSeed(seed));
@@ -28,7 +38,11 @@ function buildSvg(seed: string): string {
   const hash = window.location.hash;
   const debugLayers = hash.includes('debug=layers');
   const debugVerbose = hash.includes('debug=verbose');
-  return renderGarden(compose(prng, mode, config, viewport, debugLayers, debugVerbose));
+  // Order matters: garden consumes PRNG values first, then haiku consumes the next ones.
+  const composition = compose(prng, mode, config, viewport, debugLayers, debugVerbose);
+  const svg = renderGarden(composition);
+  const haiku = generateHaiku(prng, seed);
+  return { svg, haiku, haikuPosition: composition.haikuPosition, viewBox: composition.viewBox };
 }
 
 /**
@@ -39,14 +53,14 @@ function buildSvg(seed: string): string {
  * (instant, debounced 200ms).
  */
 export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
-  const [svg, setSvg] = useState(() => buildSvg(seed));
-  const svgRef = useRef(svg);
+  const [scene, setScene] = useState<Scene | null>(null);
+  const svgRef = useRef('');
 
-  // Re-compose when seed changes.
+  // Build scene on mount and rebuild when seed changes.
   useEffect(() => {
-    const next = buildSvg(seed);
-    svgRef.current = next;
-    setSvg(next);
+    const next = buildScene(seed);
+    svgRef.current = next.svg;
+    setScene(next);
   }, [seed]);
 
   // Re-compose when aspect-ratio class flips (landscape <-> portrait).
@@ -60,9 +74,9 @@ export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
         const newMode = getMode();
         if (newMode !== currentMode) {
           currentMode = newMode;
-          const next = buildSvg(seed);
-          svgRef.current = next;
-          setSvg(next);
+          const next = buildScene(seed);
+          svgRef.current = next.svg;
+          setScene(next);
         }
       }, 200);
     }
@@ -74,13 +88,16 @@ export function GardenCanvas({ seed }: GardenCanvasProps): ReactElement {
     };
   }, [seed]);
 
-  if (!svg) return <div className="fixed inset-0 -z-10" />;
+  if (!scene) return <div className="fixed inset-0 -z-10" />;
 
   return (
-    <div
-      className="fixed inset-0 -z-10"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <>
+      <div
+        className="fixed inset-0 -z-10"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user content
+        dangerouslySetInnerHTML={{ __html: scene.svg }}
+      />
+      <HaikuOverlay haiku={scene.haiku} position={scene.haikuPosition} viewBox={scene.viewBox} />
+    </>
   );
 }

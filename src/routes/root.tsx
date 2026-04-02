@@ -33,7 +33,7 @@ function RootLayout(): ReactElement {
   }, [menuOpen, timerOpen]);
 
   return (
-    <div>
+    <div className="relative">
       <MenuTrigger isOpen={menuOpen} onClick={() => setMenuOpen((v) => !v)} />
 
       {menuOpen && (

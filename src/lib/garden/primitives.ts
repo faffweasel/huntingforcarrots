@@ -110,9 +110,7 @@ export function generateStone(prng: () => number, params: StoneParams): Stone {
  * shifts add warmth/coolness variation — same quarry, different stones.
  */
 function generateColourShift(prng: () => number, isDominant: boolean): ColourShift {
-  const lightness = isDominant
-    ? randomFloat(prng, -0.12, -0.04)
-    : randomFloat(prng, 0.02, 0.10);
+  const lightness = isDominant ? randomFloat(prng, -0.12, -0.04) : randomFloat(prng, 0.02, 0.1);
   const hue = randomFloat(prng, -8, 8);
   const saturation = randomFloat(prng, 0.9, 1.1);
   return { lightness, hue, saturation };

@@ -1,6 +1,6 @@
-import type { ReactElement } from 'react'
-import { createRoute } from '@tanstack/react-router'
-import { rootRoute } from './root'
+import { createRoute } from '@tanstack/react-router';
+import type { ReactElement } from 'react';
+import { rootRoute } from './root';
 
 function AboutPage(): ReactElement {
   return (
@@ -39,34 +39,28 @@ function AboutPage(): ReactElement {
           }}
         >
           <p style={{ margin: '0 0 var(--space-lg)' }}>
-            A generative zen garden and a collection of reflective tools.
-            Each visit creates a unique garden and haiku. No accounts, no
-            tracking, no data collected. Just a quiet space.
-            Everything happens in your browser.
-            The timer uses a real singing bowl recording.
-            The name is deliberate. There are no carrots here.
+            A generative zen garden and a collection of reflective tools. Each visit creates a
+            unique garden and haiku. No accounts, no tracking, no data collected. Just a quiet
+            space. The timer uses a real recording for the bell. The name is deliberate. There are
+            no carrots here.
           </p>
 
           <p style={{ margin: '0 0 var(--space-lg)' }}>
-            The garden follows the rules of karesansui. Stones are placed
-            in odd-numbered groups with asymmetric arrangements. Raked sand flows in
-            concentric rings around each group and parallel
-            lines across open ground. At least forty percent of every
-            composition is empty space. It is not absence but presence. Each garden is generated from a
-            seed in the URL. The same link always produces the same
-            arrangement. After eight in the evening, the garden shifts to
-            dusk.
+            The garden follows the rules of karesansui. Stones are placed in odd-numbered groups
+            with asymmetric arrangements. Raked sand flows in concentric rings around each group and
+            parallel lines across open ground. At least forty percent of every composition is empty
+            space. It is not absence but presence. Each garden is generated from a seed in the URL.
+            The same link always produces the same arrangement. After eight in the evening, the
+            garden shifts to dusk.
           </p>
 
           <p style={{ margin: 0 }}>
-            Each haiku is assembled from hand-written line fragments: three
-            banks of five-, seven-, and five-syllable lines.
-            The selection is weighted toward the current season, though any line can appear at any time. 
-            Lines are filtered for semantic coherence. A fragment about stone is more
-            likely to pair with one about stillness than one about water.
-            The third line always carries a pivot: a shift in scale, a turn
-            toward absence, a question left open. Each line was written by a
-            human. The combinations are generative; the words are not.
+            Each haiku is assembled from hand-written line fragments: three banks of five-, seven-,
+            and five-syllable lines. The selection is weighted toward the current season, though any
+            line can appear at any time. Lines are filtered for semantic coherence. A fragment about
+            stone is more likely to pair with one about stillness than one about water. The third
+            line always carries a pivot: a shift in scale, a turn toward absence, a question left
+            open.
           </p>
         </div>
 
@@ -88,11 +82,11 @@ function AboutPage(): ReactElement {
         </footer>
       </div>
     </main>
-  )
+  );
 }
 
 export const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
   component: AboutPage,
-})
+});

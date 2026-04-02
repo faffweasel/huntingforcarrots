@@ -126,9 +126,7 @@ function renderStones(groups: readonly StoneGroup[], viewBoxHeight: number): str
       const { lightness, hue, saturation } = stone.colourShift;
       const brightness = 1 + lightness;
       const filter = `brightness(${n(brightness)}) hue-rotate(${n(hue)}deg) saturate(${n(saturation)})`;
-      paths.push(
-        `<path d="${stone.path}" opacity="${n(depthOpacity)}" style="filter:${filter}"/>`
-      );
+      paths.push(`<path d="${stone.path}" opacity="${n(depthOpacity)}" style="filter:${filter}"/>`);
     }
   }
   if (paths.length === 0) return '';

@@ -16,26 +16,25 @@ function writeSeedToHash(seed: string): void {
 }
 
 function GardenPage(): ReactElement {
-  const [seed] = useState(readSeed);
-
-  // Write the seed to the URL hash so the link is shareable.
-  useEffect(() => {
+  const [seed, setSeed] = useState(() => {
+    const s = readSeed();
+    // Write seed to hash on first load so the link is shareable.
     if (!window.location.hash.match(/^#s=/)) {
-      writeSeedToHash(seed);
+      writeSeedToHash(s);
     }
-  }, [seed]);
+    return s;
+  });
 
   // Honour external hash changes (e.g. shared links pasted in).
-  const [liveSeed, setLiveSeed] = useState(seed);
   useEffect(() => {
     function handleHashChange() {
-      setLiveSeed(readSeed());
+      setSeed(readSeed());
     }
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  return <GardenCanvas seed={liveSeed} />;
+  return <GardenCanvas seed={seed} />;
 }
 
 export const indexRoute = createRoute({

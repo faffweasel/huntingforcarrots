@@ -7,7 +7,7 @@ import { rootRoute } from './root';
 /** Reads the seed from the URL hash, or uses today's date. */
 function readSeed(): string {
   const match = window.location.hash.match(/^#s=([^&]+)/);
-  if (match) return match[1];
+  if (match && match[1].length <= 64) return match[1];
   return new Date().toISOString().slice(0, 10);
 }
 

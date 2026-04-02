@@ -61,7 +61,7 @@ function renderIslands(groups: readonly StoneGroup[], debug?: boolean, verbose?:
     const rx = maxExtentX + ISLAND_PADDING;
     const ry = maxExtentY * 0.4 + ISLAND_PADDING;
 
-    if (verbose) {
+    if (import.meta.env.DEV && verbose) {
       console.log(
         `[debug] island ${idx}: cx=${n(group.center.x)} cy=${n(group.center.y)}` +
           ` rx=${n(rx)} ry=${n(ry)}` +

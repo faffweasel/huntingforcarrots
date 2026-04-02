@@ -74,7 +74,7 @@ export function compose(
   pruneOverlappingRings(stoneGroups, perGroupRings);
 
   // --- Debug logging (#debug=verbose) ---
-  if (debugVerbose) {
+  if (import.meta.env.DEV && debugVerbose) {
     for (let i = 0; i < stoneGroups.length; i++) {
       const g = stoneGroups[i];
       const r = perGroupRings[i];

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import type { BellBuffers } from '../../lib/bell';
-import { loadBells, strikeBell } from '../../lib/bell';
+import type { BellBuffers } from '../../services/bell';
+import { loadBells, strikeBell } from '../../services/bell';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -433,6 +433,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   }
 
   function handleResume() {
+    void ensureAudio();
     setRunning(true);
     setPaused(false);
   }

@@ -58,6 +58,9 @@ src/
 │   ├── prng.ts          ← deterministic PRNG (mulberry32 or xoshiro128**)
 │   ├── noise.ts         ← simplex/Perlin noise for stone shapes
 │   └── seed.ts          ← URL hash ↔ seed parsing
+├── services/            ← modules that use browser APIs (Web Audio, DOM, fetch)
+│   ├── bell.ts          ← Web Audio API sample playback
+│   └── dusk.ts          ← time-based theme switching via DOM
 ├── data/                ← static data (JSON or typed .ts — see separation rules)
 │   └── haiku-fragments.ts
 ├── App.tsx
@@ -68,9 +71,10 @@ src/
 ### Separation rules
 
 - `src/lib/` is pure: no React, no DOM, no browser APIs. Functions take data in, return data out. These must be independently testable.
+- `src/services/` is for modules that depend on browser APIs (Web Audio, DOM, `fetch`). Not pure, not independently testable without a browser environment.
 - `src/data/` is static data only. No logic. Files are JSON where possible; `haiku-fragments.ts` is `.ts` because its fragment types require compile-time validation that JSON cannot provide.
 - `src/components/garden/` generates SVG data structures; `GardenCanvas.tsx` renders them. Keep generation logic separate from rendering.
-- `bell.ts` is the only file that touches Web Audio API. It exports `loadBells()` and `strikeBell()` functions, nothing else.
+- `services/bell.ts` is the only file that touches Web Audio API. It exports `loadBells()` and `strikeBell()` functions, nothing else.
 
 ## Design tokens
 

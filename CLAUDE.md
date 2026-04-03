@@ -111,8 +111,10 @@ Dusk design principle: **cool sky, warm earth.** UI chrome (bg, surface, text, b
 ### Typography
 
 ```css
-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 ```
+
+Inter is self-hosted from `public/fonts/` (Regular 400 and Light 300 weights, WOFF2). No external font services. `@font-face` declarations with `font-display: swap` in `src/index.css`.
 
 | Role | Weight | Size |
 |------|--------|------|
@@ -122,7 +124,7 @@ font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 | Body | 400 | 16px |
 | Small | 400 | 13px |
 
-No web fonts. System sans-serif stack only. This is a privacy constraint, not a suggestion.
+No external font services. Inter is self-hosted; no network requests to Google Fonts or CDNs. This is a privacy constraint, not a suggestion.
 
 Heading treatment (wordmark, page titles, section labels): `font-weight: 300`, `letter-spacing: 0.12–0.15em`, `color: var(--muted)`. Title case as written — no `text-transform: uppercase`. Uppercase headings are reserved for the faffweasel brand.
 

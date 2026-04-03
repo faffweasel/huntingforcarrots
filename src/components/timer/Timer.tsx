@@ -1,19 +1,10 @@
 import type { ReactElement } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import type { BellBuffers } from '../../services/bell';
-import { loadBells, strikeBell } from '../../services/bell';
+import { useEffect, useRef } from 'react';
+import { useAudio } from '../../hooks/useAudio';
+import { useCountdown } from '../../hooks/useCountdown';
+import { MAX_VAL, MIN_VAL, useScrollWheel } from '../../hooks/useScrollWheel';
 
 // ── Constants ────────────────────────────────────────────────────────────────
-
-const MIN_VAL = 1;
-const MAX_VAL = 60;
-const DEFAULT_DURATION = 5;
-const STORAGE_KEY = 'hfc-timer-duration';
-
-const DRAG_SENSITIVITY = 48;
-const FRICTION = 0.92;
-const SNAP_EASE = 0.2;
-const VEL_THRESHOLD = 0.05;
 
 const DIAL_SIZE = 140;
 const DIAL_R = 64;
@@ -25,34 +16,7 @@ const ICON_R = 8;
 const ICON_C = 2 * Math.PI * ICON_R;
 const ICON_HALF = ICON_SIZE / 2;
 
-// ── Storage ──────────────────────────────────────────────────────────────────
-
-function readStoredDuration(): number {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw !== null) {
-      const n = Number.parseInt(raw, 10);
-      if (n >= MIN_VAL && n <= MAX_VAL) return n;
-    }
-  } catch {
-    /* localStorage unavailable */
-  }
-  return DEFAULT_DURATION;
-}
-
-function writeDuration(m: number): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, String(m));
-  } catch {
-    /* */
-  }
-}
-
-function clamp(v: number): number {
-  return Math.max(MIN_VAL, Math.min(MAX_VAL, v));
-}
-
-// ── Formatting ───────────────────────────────────────────────────────────────
+// ── Formatting ──────────────────────────────────────────────────────────────
 
 function formatTime(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60);
@@ -60,18 +24,7 @@ function formatTime(totalSeconds: number): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-function announcement(totalSeconds: number): string | null {
-  if (totalSeconds === 0) return 'Timer complete';
-  if (totalSeconds === 30) return '30 seconds remaining';
-  if (totalSeconds === 10) return '10 seconds remaining';
-  if (totalSeconds % 60 === 0) {
-    const m = totalSeconds / 60;
-    return `${m} ${m === 1 ? 'minute' : 'minutes'} remaining`;
-  }
-  return null;
-}
-
-// ── Icons ────────────────────────────────────────────────────────────────────
+// ── Icons ───────────────────────────────────────────────────────────────────
 
 function PlayIcon(): ReactElement {
   return (
@@ -113,7 +66,7 @@ function ResetIcon(): ReactElement {
   );
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
+// ── Component ───────────────────────────────────────────────────────────────
 
 interface TimerProps {
   readonly isOpen: boolean;
@@ -126,337 +79,57 @@ interface TimerProps {
  * Always mounted so the countdown interval survives open/close.
  */
 export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
-  // ── State ──────────────────────────────────────────────────────────────
-  const [duration, setDuration] = useState(readStoredDuration);
-  const [remaining, setRemaining] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [pulsing, setPulsing] = useState(false);
-  const [liveText, setLiveText] = useState('');
-  const [pos, setPos] = useState(duration);
-  const [editing, setEditing] = useState(false);
-  const [editValue, setEditValue] = useState('');
+  // ── Hooks ─────────────────────────────────────────────────────────────
+  const audio = useAudio();
 
-  // ── Refs ───────────────────────────────────────────────────────────────
-  const posRef = useRef(duration);
-  const velRef = useRef(0);
-  const rafRef = useRef(0);
-  const dragging = useRef(false);
-  const dragStartY = useRef(0);
-  const dragStartPos = useRef(0);
-  const lastY = useRef(0);
-  const lastTime = useRef(0);
-  const smoothVel = useRef(0);
-  const hasMoved = useRef(false);
+  const countdown = useCountdown(() => {
+    audio.strikeComplete();
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define -- wheel is initialised before this callback fires (async via setTimeout)
+    wheel.resetPosition();
+  });
 
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const bellsRef = useRef<BellBuffers | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
-  const totalRef = useRef(0);
-  const pulseRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const durationRef = useRef(duration);
-  durationRef.current = duration;
+  const isActive = countdown.running || countdown.paused;
 
-  const spinRef = useRef<HTMLDivElement>(null);
+  const wheel = useScrollWheel({
+    isEnabled: isOpen && !isActive,
+  });
+
+  // ── Refs ──────────────────────────────────────────────────────────────
   const iconRef = useRef<HTMLButtonElement>(null);
   const countdownRef = useRef<HTMLDivElement>(null);
   const areaRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  const isActive = running || paused;
-
-  // ── Scroll value helpers ───────────────────────────────────────────────
-
-  function commitValue(v: number) {
-    const r = clamp(Math.round(v));
-    posRef.current = r;
-    setPos(r);
-    if (r !== durationRef.current) {
-      writeDuration(r);
-      setDuration(r);
-    }
-  }
-
-  function stopAnim() {
-    cancelAnimationFrame(rafRef.current);
-    velRef.current = 0;
-  }
-
-  function animate() {
-    if (dragging.current) return;
-    if (Math.abs(velRef.current) > VEL_THRESHOLD) {
-      velRef.current *= FRICTION;
-      const next = clamp(posRef.current + velRef.current);
-      if (next <= MIN_VAL || next >= MAX_VAL) velRef.current = 0;
-      posRef.current = next;
-      setPos(next);
-      rafRef.current = requestAnimationFrame(animate);
-    } else {
-      velRef.current = 0;
-      const target = clamp(Math.round(posRef.current));
-      const diff = target - posRef.current;
-      if (Math.abs(diff) < 0.005) {
-        commitValue(target);
-        return;
-      }
-      posRef.current += diff * SNAP_EASE;
-      setPos(posRef.current);
-      rafRef.current = requestAnimationFrame(animate);
-    }
-  }
-
-  function ptrDown(clientY: number) {
-    stopAnim();
-    dragging.current = true;
-    hasMoved.current = false;
-    dragStartY.current = clientY;
-    dragStartPos.current = posRef.current;
-    lastY.current = clientY;
-    lastTime.current = performance.now();
-    smoothVel.current = 0;
-  }
-
-  function ptrMove(clientY: number) {
-    if (!dragging.current) return;
-    const delta = dragStartY.current - clientY;
-    if (Math.abs(delta) > 3) hasMoved.current = true;
-    posRef.current = clamp(dragStartPos.current + delta / DRAG_SENSITIVITY);
-    setPos(posRef.current);
-    const now = performance.now();
-    const dt = now - lastTime.current;
-    if (dt > 0) {
-      const instant = ((lastY.current - clientY) / DRAG_SENSITIVITY / dt) * 16;
-      smoothVel.current = 0.7 * instant + 0.3 * smoothVel.current;
-    }
-    lastY.current = clientY;
-    lastTime.current = now;
-  }
-
-  function ptrUp() {
-    if (!dragging.current) return;
-    dragging.current = false;
-    velRef.current = smoothVel.current;
-    rafRef.current = requestAnimationFrame(animate);
-  }
-
-  // ── Scroll event binding (open + idle only) ────────────────────────────
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll handlers only use refs — semantically stable across renders
-  useEffect(() => {
-    if (!isOpen || running || paused) return;
-    const el = spinRef.current;
-    if (!el) return;
-
-    function onMM(e: MouseEvent) {
-      ptrMove(e.clientY);
-    }
-    function onMU() {
-      ptrUp();
-      document.removeEventListener('mousemove', onMM);
-      document.removeEventListener('mouseup', onMU);
-    }
-    function onMD(e: MouseEvent) {
-      e.preventDefault();
-      ptrDown(e.clientY);
-      document.addEventListener('mousemove', onMM);
-      document.addEventListener('mouseup', onMU);
-    }
-    function onTS(e: TouchEvent) {
-      ptrDown(e.touches[0].clientY);
-    }
-    function onTM(e: TouchEvent) {
-      e.preventDefault();
-      ptrMove(e.touches[0].clientY);
-    }
-    function onTE() {
-      ptrUp();
-    }
-    function onW(e: WheelEvent) {
-      e.preventDefault();
-      stopAnim();
-      posRef.current = clamp(posRef.current - (e.deltaY / DRAG_SENSITIVITY) * 0.5);
-      setPos(posRef.current);
-      rafRef.current = requestAnimationFrame(animate);
-    }
-
-    el.addEventListener('mousedown', onMD);
-    el.addEventListener('touchstart', onTS, { passive: true });
-    el.addEventListener('touchmove', onTM, { passive: false });
-    el.addEventListener('touchend', onTE);
-    el.addEventListener('wheel', onW, { passive: false });
-    return () => {
-      el.removeEventListener('mousedown', onMD);
-      el.removeEventListener('touchstart', onTS);
-      el.removeEventListener('touchmove', onTM);
-      el.removeEventListener('touchend', onTE);
-      el.removeEventListener('wheel', onW);
-      document.removeEventListener('mousemove', onMM);
-      document.removeEventListener('mouseup', onMU);
-    };
-  }, [isOpen, running, paused]);
-
-  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
-
-  // ── Spinbutton keyboard ────────────────────────────────────────────────
-
-  function handleSpinKeyDown(e: React.KeyboardEvent) {
-    switch (e.key) {
-      case 'ArrowUp':
-        e.preventDefault();
-        commitValue(clamp(durationRef.current + 1));
-        break;
-      case 'ArrowDown':
-        e.preventDefault();
-        commitValue(clamp(durationRef.current - 1));
-        break;
-      case 'Home':
-        e.preventDefault();
-        commitValue(MIN_VAL);
-        break;
-      case 'End':
-        e.preventDefault();
-        commitValue(MAX_VAL);
-        break;
-    }
-  }
-
-  // ── Direct number input ────────────────────────────────────────────────
-
-  function handleNumberClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    setEditValue(String(durationRef.current));
-    setEditing(true);
-    requestAnimationFrame(() => inputRef.current?.select());
-  }
-
-  function commitEdit() {
-    setEditing(false);
-    const n = Number.parseInt(editValue, 10);
-    if (!Number.isNaN(n) && n >= MIN_VAL && n <= MAX_VAL) {
-      commitValue(n);
-    }
-  }
-
-  function handleEditKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      commitEdit();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setEditing(false);
-    }
-    e.stopPropagation();
-  }
-
-  // ── Countdown tick ─────────────────────────────────────────────────────
-  // Uses recursive setTimeout so each tick explicitly schedules the next.
-  // When the timer completes, no next tick is scheduled — structurally
-  // impossible to fire the completion bell more than once.
-
-  const remainingRef = useRef(0);
-
-  useEffect(() => {
-    if (!running) return;
-
-    function tick() {
-      const next = remainingRef.current - 1;
-      remainingRef.current = next;
-      if (next <= 0) {
-        remainingRef.current = 0;
-        if (audioCtxRef.current && bellsRef.current) {
-          strikeBell(audioCtxRef.current, bellsRef.current.complete);
-        }
-        setPulsing(true);
-        pulseRef.current = setTimeout(() => setPulsing(false), 2000);
-        setRemaining(0);
-        setRunning(false);
-        setPaused(false);
-        setLiveText('Timer complete');
-        posRef.current = durationRef.current;
-        setPos(durationRef.current);
-      } else {
-        setRemaining(next);
-        const text = announcement(next);
-        if (text) setLiveText(text);
-        intervalRef.current = setTimeout(tick, 1000);
-      }
-    }
-
-    intervalRef.current = setTimeout(tick, 1000);
-    return () => clearTimeout(intervalRef.current);
-  }, [running]);
-
-  useEffect(() => () => clearTimeout(pulseRef.current), []);
-
-  // ── Audio ──────────────────────────────────────────────────────────────
-
-  async function ensureAudio(): Promise<void> {
-    if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-    if (!bellsRef.current) {
-      try {
-        bellsRef.current = await loadBells(audioCtxRef.current);
-      } catch {
-        /* audio files may not exist yet */
-      }
-    }
-    if (audioCtxRef.current.state === 'suspended') await audioCtxRef.current.resume();
-  }
-
-  // ── Actions ────────────────────────────────────────────────────────────
+  // ── Actions ───────────────────────────────────────────────────────────
 
   function handleStart() {
-    const d = durationRef.current;
-    const total = d * 60;
-    totalRef.current = total;
-    remainingRef.current = total;
-    setRemaining(total);
-    setRunning(true);
-    setPaused(false);
-    setLiveText(`${d} ${d === 1 ? 'minute' : 'minutes'} remaining`);
+    countdown.start(wheel.duration * 60);
     // Fire-and-forget: ensureAudio resolves the AudioContext (created on this
     // user gesture) then strikes the bell.  State updates above are synchronous
     // so React removes the Start button before a second click can land.
-    void ensureAudio().then(() => {
-      if (audioCtxRef.current && bellsRef.current) {
-        strikeBell(audioCtxRef.current, bellsRef.current.begin);
-      }
-    });
+    void audio.ensureAudio().then(() => audio.strikeBegin());
   }
 
   function handlePause() {
-    clearTimeout(intervalRef.current);
-    setRunning(false);
-    setPaused(true);
+    countdown.pause();
   }
 
   function handleResume() {
-    void ensureAudio();
-    setRunning(true);
-    setPaused(false);
+    void audio.ensureAudio();
+    countdown.resume();
   }
 
   function handleReset() {
-    clearTimeout(intervalRef.current);
-    setRunning(false);
-    setPaused(false);
-    remainingRef.current = 0;
-    setRemaining(0);
-    setLiveText('');
-    posRef.current = durationRef.current;
-    setPos(durationRef.current);
+    countdown.stop();
+    wheel.resetPosition();
   }
 
   function handleResetToDefault() {
-    writeDuration(DEFAULT_DURATION);
-    setDuration(DEFAULT_DURATION);
-    posRef.current = DEFAULT_DURATION;
-    setPos(DEFAULT_DURATION);
+    wheel.resetToDefault();
   }
 
-  // ── Click outside to close ─────────────────────────────────────────────
+  // ── Click outside to close ────────────────────────────────────────────
 
   useEffect(() => {
     if (!isOpen) return;
@@ -477,7 +150,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
     };
   }, [isOpen]);
 
-  // ── Focus management ───────────────────────────────────────────────────
+  // ── Focus management ──────────────────────────────────────────────────
 
   const prevOpenRef = useRef(isOpen);
   useEffect(() => {
@@ -487,15 +160,11 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
   const prevRunningRef = useRef(false);
   useEffect(() => {
-    if (running && !prevRunningRef.current && isOpen) countdownRef.current?.focus();
-    prevRunningRef.current = running;
-  }, [running, isOpen]);
+    if (countdown.running && !prevRunningRef.current && isOpen) countdownRef.current?.focus();
+    prevRunningRef.current = countdown.running;
+  }, [countdown.running, isOpen]);
 
-  // ── Progress fraction ──────────────────────────────────────────────────
-
-  const progress = isActive && totalRef.current > 0 ? remaining / totalRef.current : 0;
-
-  // ── Shared styles ──────────────────────────────────────────────────────
+  // ── Shared styles ─────────────────────────────────────────────────────
 
   const actionBtnClass =
     'flex items-center justify-center w-11 h-11 bg-transparent border-0 cursor-pointer p-0 ' +
@@ -508,7 +177,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
     color: 'var(--text)',
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -560,12 +229,12 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   cy={DIAL_HALF}
                   r={DIAL_R}
                   fill="none"
-                  stroke={pulsing ? 'var(--text)' : 'var(--interactive)'}
+                  stroke={countdown.pulsing ? 'var(--text)' : 'var(--interactive)'}
                   strokeWidth="3"
                   strokeLinecap="round"
                   transform={`rotate(-90 ${DIAL_HALF} ${DIAL_HALF})`}
                   strokeDasharray={DIAL_C}
-                  strokeDashoffset={DIAL_C * (1 - (isActive ? progress : 1))}
+                  strokeDashoffset={DIAL_C * (1 - (isActive ? countdown.progress : 1))}
                 />
               </svg>
 
@@ -577,32 +246,32 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   tabIndex={-1}
                   className="relative flex items-center justify-center"
                 >
-                  <span style={numberStyle}>{formatTime(remaining)}</span>
+                  <span style={numberStyle}>{formatTime(countdown.remaining)}</span>
                 </div>
               ) : (
                 <div
-                  ref={spinRef}
+                  ref={wheel.spinRef}
                   role="spinbutton"
                   tabIndex={0}
                   aria-label="Timer duration in minutes"
                   aria-valuemin={MIN_VAL}
                   aria-valuemax={MAX_VAL}
-                  aria-valuenow={Math.round(pos)}
-                  aria-valuetext={`${Math.round(pos)} minutes`}
-                  onKeyDown={handleSpinKeyDown}
+                  aria-valuenow={wheel.displayValue}
+                  aria-valuetext={`${wheel.displayValue} minutes`}
+                  onKeyDown={wheel.handleSpinKeyDown}
                   className="relative flex flex-col items-center justify-center gap-1 cursor-ns-resize select-none"
                   style={{ width: DIAL_SIZE, height: DIAL_SIZE }}
                 >
-                  {editing ? (
+                  {wheel.editing ? (
                     <input
-                      ref={inputRef}
+                      ref={wheel.inputRef}
                       type="number"
                       min={MIN_VAL}
                       max={MAX_VAL}
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={commitEdit}
-                      onKeyDown={handleEditKeyDown}
+                      value={wheel.editValue}
+                      onChange={(e) => wheel.setEditValue(e.target.value)}
+                      onBlur={wheel.commitEdit}
+                      onKeyDown={wheel.handleEditKeyDown}
                       aria-label="Timer duration in minutes"
                       className="leading-none bg-transparent border-0 text-center p-0 m-0"
                       style={{
@@ -623,10 +292,10 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                         padding: 0,
                       }}
                       className="leading-none min-w-[44px] min-h-[44px]"
-                      onClick={handleNumberClick}
-                      aria-label={`${Math.round(pos)} minutes — click to edit`}
+                      onClick={wheel.handleNumberClick}
+                      aria-label={`${wheel.displayValue} minutes — click to edit`}
                     >
-                      {Math.round(pos)}
+                      {wheel.displayValue}
                     </button>
                   )}
                   <span
@@ -650,11 +319,13 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                 <>
                   <button
                     type="button"
-                    onClick={running ? handlePause : handleResume}
-                    aria-label={running ? 'Pause meditation timer' : 'Resume meditation timer'}
+                    onClick={countdown.running ? handlePause : handleResume}
+                    aria-label={
+                      countdown.running ? 'Pause meditation timer' : 'Resume meditation timer'
+                    }
                     className={actionBtnClass}
                   >
-                    {running ? <PauseIcon /> : <PlayIcon />}
+                    {countdown.running ? <PauseIcon /> : <PlayIcon />}
                   </button>
                   <button
                     type="button"
@@ -700,7 +371,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   height={ICON_SIZE}
                   viewBox={`0 0 ${ICON_SIZE} ${ICON_SIZE}`}
                   aria-hidden="true"
-                  style={pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
+                  style={countdown.pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
                 >
                   <circle cx={ICON_HALF} cy={ICON_HALF} r={ICON_R} fill="currentColor" />
                 </svg>
@@ -716,7 +387,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
           onClick={onToggle}
           aria-label="Open meditation timer"
           aria-expanded={false}
-          className={`fixed bottom-6 right-6 z-10 flex flex-col items-center justify-center w-11 min-h-[44px] bg-transparent border-0 cursor-pointer p-0 hover:[color:var(--text)] transition-colors duration-150 ${pulsing ? '[color:var(--text)]' : '[color:var(--muted)]'}`}
+          className={`fixed bottom-6 right-6 z-10 flex flex-col items-center justify-center w-11 min-h-[44px] bg-transparent border-0 cursor-pointer p-0 hover:[color:var(--text)] transition-colors duration-150 ${countdown.pulsing ? '[color:var(--text)]' : '[color:var(--muted)]'}`}
         >
           <svg
             width={ICON_SIZE}
@@ -724,7 +395,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
             viewBox={`0 0 ${ICON_SIZE} ${ICON_SIZE}`}
             fill="none"
             aria-hidden="true"
-            style={pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
+            style={countdown.pulsing ? { animation: 'bell-pulse 0.6s ease-out' } : undefined}
           >
             {/* Track ring */}
             <circle
@@ -748,7 +419,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                 strokeLinecap="round"
                 transform={`rotate(-90 ${ICON_HALF} ${ICON_HALF})`}
                 strokeDasharray={ICON_C}
-                strokeDashoffset={ICON_C * (1 - progress)}
+                strokeDashoffset={ICON_C * (1 - countdown.progress)}
               />
             )}
           </svg>
@@ -762,7 +433,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                 marginTop: 2,
               }}
             >
-              {formatTime(remaining)}
+              {formatTime(countdown.remaining)}
             </span>
           )}
         </button>
@@ -770,7 +441,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
       {/* Screen reader announcements — always mounted */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {liveText}
+        {countdown.liveText}
       </div>
     </>
   );

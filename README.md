@@ -8,7 +8,7 @@ A generative zen garden. Each day creates a unique karesansui and haiku. No trac
 
 A procedurally generated dry landscape garden rendered as SVG, with a haiku assembled from curated fragment banks. The garden changes daily — everyone sees the same composition on the same day. A meditation timer with singing bowl audio sits quietly in the corner if you want it.
 
-Everything runs client-side. Nothing leaves your browser.
+Everything runs client-side. 
 
 ## Stack
 

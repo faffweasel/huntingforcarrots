@@ -47,13 +47,14 @@ src/
 │   │   ├── generator.ts     ← fragment picker + semantic filtering
 │   │   └── fragments.ts     ← curated line fragment data
 │   ├── timer/           ← meditation timer
-│   │   ├── TimerPanel.tsx
-│   │   ├── TimerIcon.tsx
-│   │   ├── ScrollWheel.tsx   ← minute selector wheel
-│   │   └── bell.ts          ← Web Audio API sample playback
+│   │   └── Timer.tsx         ← timer shell (composes hooks)
 │   └── nav/             ← hamburger menu / navigation panel
 │       ├── NavPanel.tsx
 │       └── NavIcon.tsx
+├── hooks/               ← custom React hooks
+│   ├── useAudio.ts          ← Web Audio bell playback
+│   ├── useCountdown.ts      ← countdown timer state + tick logic
+│   └── useScrollWheel.ts    ← scroll/drag/touch minute selector
 ├── lib/                 ← pure functions, no React/DOM imports
 │   ├── prng.ts          ← deterministic PRNG (mulberry32 or xoshiro128**)
 │   ├── noise.ts         ← simplex/Perlin noise for stone shapes
@@ -75,6 +76,7 @@ src/
 - `src/data/` is static data only. No logic. Files are JSON where possible; `haiku-fragments.ts` is `.ts` because its fragment types require compile-time validation that JSON cannot provide.
 - `src/components/garden/` generates SVG data structures; `GardenCanvas.tsx` renders them. Keep generation logic separate from rendering.
 - `services/bell.ts` is the only file that touches Web Audio API. It exports `loadBells()` and `strikeBell()` functions, nothing else.
+- `src/hooks/` is for custom React hooks that extract stateful logic from components. Hooks may import from `src/services/` and `src/lib/`.
 
 ## Design tokens
 

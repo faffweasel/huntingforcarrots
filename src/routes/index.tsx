@@ -16,14 +16,14 @@ function writeSeedToHash(seed: string): void {
 }
 
 function GardenPage(): ReactElement {
-  const [seed, setSeed] = useState(() => {
-    const s = readSeed();
-    // Write seed to hash on first load so the link is shareable.
+  const [seed, setSeed] = useState(readSeed);
+
+  // Write seed to hash on first load so the link is shareable.
+  useEffect(() => {
     if (!window.location.hash.match(/^#s=/)) {
-      writeSeedToHash(s);
+      writeSeedToHash(seed);
     }
-    return s;
-  });
+  }, [seed]);
 
   // Honour external hash changes (e.g. shared links pasted in).
   useEffect(() => {

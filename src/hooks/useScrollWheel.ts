@@ -97,8 +97,7 @@ export function useScrollWheel({ isEnabled }: UseScrollWheelOptions): UseScrollW
   }
 
   const reducedMotion = useRef(
-    typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 
   function animate() {

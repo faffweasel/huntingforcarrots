@@ -96,8 +96,17 @@ export function useScrollWheel({ isEnabled }: UseScrollWheelOptions): UseScrollW
     velRef.current = 0;
   }
 
+  const reducedMotion = useRef(
+    typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+
   function animate() {
     if (dragging.current) return;
+    if (reducedMotion.current) {
+      commitValue(clamp(Math.round(posRef.current)));
+      return;
+    }
     if (Math.abs(velRef.current) > VEL_THRESHOLD) {
       velRef.current *= FRICTION;
       const next = clamp(posRef.current + velRef.current);

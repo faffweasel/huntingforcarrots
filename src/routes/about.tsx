@@ -4,48 +4,21 @@ import { rootRoute } from './root';
 
 function AboutPage(): ReactElement {
   return (
-    <main
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        padding: 'var(--space-2xl) 24px var(--space-xl)',
-      }}
-    >
-      <div style={{ maxWidth: 640, width: '100%' }}>
-        <h1
-          style={{
-            fontWeight: 300,
-            fontSize: 24,
-            letterSpacing: '0.15em',
-            color: 'var(--muted)',
-            marginTop: 0,
-            marginBottom: 'var(--space-xl)',
-            textAlign: 'center',
-          }}
-        >
+    <main className="flex flex-col items-center justify-center min-h-screen [padding:var(--space-2xl)_24px_var(--space-xl)]">
+      <div className="w-full max-w-[640px]">
+        <h1 className="font-light text-2xl [letter-spacing:0.15em] [color:var(--muted)] mt-0 [margin-bottom:var(--space-xl)] text-center">
           Hunting for Carrots
         </h1>
 
-        <div
-          style={{
-            fontWeight: 400,
-            fontSize: 16,
-            lineHeight: 1.6,
-            color: 'var(--text)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ margin: '0 0 var(--space-lg)' }}>
+        <div className="font-normal text-base leading-[1.6] [color:var(--text)] text-center">
+          <p className="[margin:0_0_var(--space-lg)]">
             A generative zen garden and a collection of reflective tools. Each visit creates a
             unique garden and haiku. No accounts, no tracking, no data collected. Just a quiet
             space. The timer uses a real recording for the bell. The name is deliberate. There are
             no carrots here.
           </p>
 
-          <p style={{ margin: '0 0 var(--space-lg)' }}>
+          <p className="[margin:0_0_var(--space-lg)]">
             The garden follows the rules of karesansui. Stones are placed in odd-numbered groups
             with asymmetric arrangements. Raked sand flows in concentric rings around each group and
             parallel lines across open ground. At least forty percent of every composition is empty
@@ -54,7 +27,7 @@ function AboutPage(): ReactElement {
             garden shifts to dusk.
           </p>
 
-          <p style={{ margin: 0 }}>
+          <p className="m-0">
             Each haiku is assembled from hand-written line fragments: three banks of five-, seven-,
             and five-syllable lines. The selection is weighted toward the current season, though any
             line can appear at any time. Lines are filtered for semantic coherence. A fragment about
@@ -64,18 +37,10 @@ function AboutPage(): ReactElement {
           </p>
         </div>
 
-        <footer
-          style={{
-            marginTop: 'var(--space-xl)',
-            fontSize: 13,
-            color: 'var(--muted)',
-            textAlign: 'center',
-          }}
-        >
+        <footer className="[margin-top:var(--space-xl)] text-[13px] [color:var(--muted)] text-center">
           <a
             href="https://faffweasel.com"
-            className="no-underline hover:underline"
-            style={{ color: 'var(--interactive)' }}
+            className="no-underline hover:underline [color:var(--interactive)]"
           >
             Faffweasel Industries
           </a>

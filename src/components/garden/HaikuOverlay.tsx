@@ -77,9 +77,11 @@ export function HaikuOverlay({ haiku, position, viewBox }: HaikuOverlayProps): R
       className="fixed z-[1] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap px-8 font-light text-[16px] leading-[2] tracking-[0.02em] text-[color:var(--text)] md:text-[18px] lg:text-[20px]"
       style={{ left: `${left}%`, top: `${top}%` }}
     >
-      <p>{haiku.line1}</p>
-      <p>{haiku.line2}</p>
-      <p>{haiku.line3}</p>
+      <article aria-label="Daily haiku">
+        <p>{haiku.line1}</p>
+        <p>{haiku.line2}</p>
+        <p>{haiku.line3}</p>
+      </article>
     </div>
   );
 }

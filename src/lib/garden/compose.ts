@@ -151,8 +151,10 @@ function distributeStones(total: number): readonly number[] {
       return [3, 2];
     case 7:
       return [3, 2, 2];
-    default:
-      return [total];
+    default: {
+      const _exhaustive: never = total as never;
+      throw new Error(`Unexpected stone count: ${_exhaustive}`);
+    }
   }
 }
 

@@ -5,6 +5,7 @@ export interface BellBuffers {
 
 async function fetchAndDecode(audioContext: AudioContext, url: string): Promise<AudioBuffer> {
   const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
   const arrayBuffer = await response.arrayBuffer();
   return audioContext.decodeAudioData(arrayBuffer);
 }

@@ -84,7 +84,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
   const countdown = useCountdown(() => {
     audio.strikeComplete();
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define -- wheel is initialised before this callback fires (async via setTimeout)
+    // wheel is initialised before this callback fires (async via setTimeout)
     wheel.resetPosition();
   });
 

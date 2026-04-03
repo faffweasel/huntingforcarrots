@@ -1,14 +1,14 @@
-export type MenuItem = {
+export interface MenuItem {
   readonly label: string;
   readonly href: string;
   readonly external: boolean;
   readonly status: 'active' | 'coming-soon';
-};
+}
 
-export type MenuSection = {
+export interface MenuSection {
   readonly heading?: string;
   readonly items: readonly MenuItem[];
-};
+}
 
 export const menuSections: readonly MenuSection[] = [
   {

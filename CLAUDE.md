@@ -36,35 +36,41 @@ npm run check:fix    # Biome auto-fix
 ```
 src/
 ├── components/          ← React components (named exports)
-│   ├── garden/          ← SVG garden generator
+│   ├── garden/          ← SVG garden + haiku rendering
 │   │   ├── GardenCanvas.tsx
-│   │   ├── stones.ts        ← stone shape generation
-│   │   ├── raking.ts        ← rake pattern generation
-│   │   ├── moss.ts          ← moss patch generation
-│   │   └── composition.ts   ← layout/placement rules
-│   ├── haiku/           ← haiku engine
-│   │   ├── HaikuDisplay.tsx
-│   │   ├── generator.ts     ← fragment picker + semantic filtering
-│   │   └── fragments.ts     ← curated line fragment data
-│   ├── timer/           ← meditation timer
-│   │   └── Timer.tsx         ← timer shell (composes hooks)
-│   └── nav/             ← hamburger menu / navigation panel
-│       ├── NavPanel.tsx
-│       └── NavIcon.tsx
+│   │   └── HaikuOverlay.tsx
+│   ├── navigation/      ← hamburger menu / navigation panel
+│   │   ├── MenuPanel.tsx
+│   │   ├── MenuTrigger.tsx
+│   │   ├── menu-items.ts    ← nav link data
+│   │   └── useFocusTrap.ts  ← focus trap hook for menu
+│   └── timer/           ← meditation timer
+│       └── Timer.tsx         ← timer shell (composes hooks)
+├── data/                ← static data (typed .ts — see separation rules)
+│   └── haiku-fragments.ts
 ├── hooks/               ← custom React hooks
 │   ├── useAudio.ts          ← Web Audio bell playback
 │   ├── useCountdown.ts      ← countdown timer state + tick logic
 │   └── useScrollWheel.ts    ← scroll/drag/touch minute selector
 ├── lib/                 ← pure functions, no React/DOM imports
-│   ├── prng.ts          ← deterministic PRNG (mulberry32 or xoshiro128**)
-│   ├── noise.ts         ← simplex/Perlin noise for stone shapes
-│   └── seed.ts          ← URL hash ↔ seed parsing
+│   ├── garden/              ← garden generation logic
+│   │   ├── compose.ts       ← layout/placement rules
+│   │   ├── primitives.ts    ← base shape + rake pattern generation
+│   │   ├── render.ts        ← SVG path rendering
+│   │   ├── stones.ts        ← stone group generation
+│   │   └── types.ts         ← shared garden types
+│   ├── haiku.ts             ← fragment picker + semantic filtering
+│   ├── prng.ts              ← deterministic PRNG (mulberry32 or xoshiro128**)
+│   └── seed.ts              ← URL hash ↔ seed parsing
+├── routes/              ← TanStack Router route definitions
+│   ├── about.tsx
+│   ├── index.tsx
+│   ├── methodology.tsx
+│   ├── root.tsx             ← root layout (app shell)
+│   └── route-tree.ts       ← route tree assembly
 ├── services/            ← modules that use browser APIs (Web Audio, DOM, fetch)
-│   ├── bell.ts          ← Web Audio API sample playback
-│   └── dusk.ts          ← time-based theme switching via DOM
-├── data/                ← static data (JSON or typed .ts — see separation rules)
-│   └── haiku-fragments.ts
-├── App.tsx
+│   ├── bell.ts              ← Web Audio API sample playback
+│   └── dusk.ts              ← time-based theme switching via DOM
 ├── main.tsx
 └── index.css            ← Tailwind directives + CSS custom properties
 ```
@@ -74,7 +80,7 @@ src/
 - `src/lib/` is pure: no React, no DOM, no browser APIs. Functions take data in, return data out. These must be independently testable.
 - `src/services/` is for modules that depend on browser APIs (Web Audio, DOM, `fetch`). Not pure, not independently testable without a browser environment.
 - `src/data/` is static data only. No logic. Files are JSON where possible; `haiku-fragments.ts` is `.ts` because its fragment types require compile-time validation that JSON cannot provide.
-- `src/components/garden/` generates SVG data structures; `GardenCanvas.tsx` renders them. Keep generation logic separate from rendering.
+- `src/lib/garden/` generates SVG data structures; `src/components/garden/` renders them. Keep generation logic separate from rendering.
 - `services/bell.ts` is the only file that touches Web Audio API. It exports `loadBells()` and `strikeBell()` functions, nothing else.
 - `src/hooks/` is for custom React hooks that extract stateful logic from components. Hooks may import from `src/services/` and `src/lib/`.
 
@@ -164,7 +170,7 @@ Fragment composition, not word-level slot-filling. Three banks of curated line f
 - Season from `new Date().getMonth()`: Mar–May spring, Jun–Aug summer, Sep–Nov autumn, Dec–Feb winter.
 - Season weighting: 60% current season, 40% any. Not forced.
 - Line 3 must have a pivot (scale shift, time shift, absence, observer, question, or acceptance).
-- Fragment data lives in `src/data/haiku-fragments.json`.
+- Fragment data lives in `src/data/haiku-fragments.ts`.
 - Haiku renders as `<p>` elements positioned over the SVG with CSS, not as `<text>` inside the SVG. Must be screen-reader accessible.
 
 ## Timer

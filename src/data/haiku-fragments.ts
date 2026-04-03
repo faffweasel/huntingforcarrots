@@ -899,7 +899,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     season: 'autumn',
     clusters: ['growth', 'absence'],
     setting: 'natural',
-    nouns: [{ word: 'leaf', strength: 'weak' }],
+    nouns: [{ word: 'leaf', strength: 'strong' }],
   },
   {
     text: 'the path fades in mist',
@@ -1201,7 +1201,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     conceptual_group: 'cat',
   },
   {
-    text: 'chanting sutras in the hall',
+    text: 'chanting sutras in the night',
     syllables: 7,
     season: 'none',
     clusters: ['sound', 'stillness'],
@@ -1482,7 +1482,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'incense mixing with car fumes',
     syllables: 7,
     season: 'none',
-    clusters: ['sound'],
+    clusters: ['stillness'],
     setting: 'urban',
     nouns: [
       { word: 'incense', strength: 'strong' },
@@ -1691,7 +1691,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     ],
   },
   {
-    text: 'deer grazing on fresh shoots',
+    text: 'young deer grazing on fresh shoots',
     syllables: 7,
     season: 'spring',
     clusters: ['growth'],
@@ -2062,7 +2062,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
-      { word: 'leaf', strength: 'weak' },
+      { word: 'leaf', strength: 'strong' },
       { word: 'stone', strength: 'weak' },
     ],
   },
@@ -3073,7 +3073,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     ],
   },
   {
-    text: 'while the lizards sleep',
+    text: 'while the lizards bask',
     syllables: 5,
     season: 'summer',
     clusters: ['growth', 'stillness'],
@@ -3132,7 +3132,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     clusters: ['growth', 'absence'],
     pivot: 'absence',
     setting: 'natural',
-    nouns: [{ word: 'leaf', strength: 'weak' }],
+    nouns: [{ word: 'leaf', strength: 'strong' }],
   },
   {
     text: 'who raked this old stone?',
@@ -3227,7 +3227,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     clusters: ['growth', 'absence'],
     pivot: 'time-shift',
     setting: 'natural',
-    nouns: [{ word: 'leaf', strength: 'weak' }],
+    nouns: [{ word: 'leaf', strength: 'strong' }],
   },
 
   // --- Winter (11) ---

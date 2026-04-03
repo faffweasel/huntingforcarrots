@@ -87,6 +87,7 @@ export function useCountdown(onComplete: () => void): UseCountdownReturn {
   }
 
   function resume() {
+    clearTimeout(intervalRef.current);
     setRunning(true);
     setPaused(false);
   }

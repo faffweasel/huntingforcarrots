@@ -69,12 +69,7 @@ function toViewportPixels(
  *   left ≥ PAD_LEFT, right ≤ vpW - PAD_RIGHT.
  * Falls back to viewport centre if the safe zone is too small (tiny viewport).
  */
-function clampCenter(
-  cx: number,
-  cy: number,
-  vpW: number,
-  vpH: number
-): { x: number; y: number } {
+function clampCenter(cx: number, cy: number, vpW: number, vpH: number): { x: number; y: number } {
   const minX = PAD_LEFT + TEXT_HALF_W;
   const maxX = vpW - PAD_RIGHT - TEXT_HALF_W;
   const minY = PAD_TOP + TEXT_HALF_H;
@@ -94,7 +89,12 @@ function clampCenter(
 export function HaikuOverlay({ haiku, position, viewBox }: HaikuOverlayProps): ReactElement {
   const viewport = useViewportSize();
   const pixel = toViewportPixels(
-    position.x, position.y, viewBox.width, viewBox.height, viewport.width, viewport.height
+    position.x,
+    position.y,
+    viewBox.width,
+    viewBox.height,
+    viewport.width,
+    viewport.height
   );
   const clamped = clampCenter(pixel.x, pixel.y, viewport.width, viewport.height);
   const left = (clamped.x / viewport.width) * 100;

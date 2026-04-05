@@ -9,12 +9,13 @@ interface Props {
   readonly currentPath: string;
   readonly isOpen: boolean;
   readonly onClose: () => void;
+  readonly onBeforeNavigate?: () => boolean;
 }
 
 // Registered route paths — kept in sync with src/routes/route-tree.ts.
 // The cast in toRegisteredPath() is safe: guarded by Set.has() before use.
-type RegisteredPath = '/' | '/about' | '/methodology';
-const REGISTERED_PATHS = new Set<string>(['/', '/about', '/methodology']);
+type RegisteredPath = '/' | '/about' | '/privacy';
+const REGISTERED_PATHS = new Set<string>(['/', '/about', '/privacy']);
 
 function toRegisteredPath(s: string): RegisteredPath | null {
   return REGISTERED_PATHS.has(s) ? (s as RegisteredPath) : null;
@@ -41,7 +42,7 @@ function isCurrentPage(item: MenuItem, currentPath: string): boolean {
 }
 
 // Brand mark: 4 concentric arcs, center (12,12), radii 3.5/5.5/7.5/9.5.
-// Open at the bottom (30°–150° gap) to suggest the rake's path.
+// Open at the bottom (30deg-150deg gap) to suggest the rake's path.
 function RakedCircleMark(): ReactElement {
   return (
     <svg
@@ -84,14 +85,21 @@ interface NavItemProps {
   readonly item: MenuItem;
   readonly currentPath: string;
   readonly onClose: () => void;
+  readonly onBeforeNavigate?: () => boolean;
   readonly isFooter: boolean;
 }
 
-function NavItem({ item, currentPath, onClose, isFooter }: NavItemProps): ReactElement {
+function NavItem({
+  item,
+  currentPath,
+  onClose,
+  onBeforeNavigate,
+  isFooter,
+}: NavItemProps): ReactElement {
   const isCurrent = isCurrentPage(item, currentPath);
   const internalPath = resolveInternalPath(item);
 
-  const sizeClass = isFooter ? 'text-[13px]' : 'text-[14px] [letter-spacing:0.08em]';
+  const sizeClass = isFooter ? 'text-[13px]' : 'text-sm [letter-spacing:0.08em]';
 
   // Dot indicator occupies fixed width so items stay left-aligned regardless.
   const dot = (
@@ -118,10 +126,18 @@ function NavItem({ item, currentPath, onClose, isFooter }: NavItemProps): ReactE
   }
 
   // min-h-[44px] on the link element itself (not the <li>) satisfies the
-  // 44×44px touch target requirement without relying on parent padding.
+  // 44x44px touch target requirement without relying on parent padding.
   const linkClass = `${sizeClass} flex items-center min-h-[44px] transition-colors duration-150 ${
     isCurrent ? '[color:var(--text)]' : '[color:var(--muted)] hover:[color:var(--text)]'
   }`;
+
+  function handleClick(e: React.MouseEvent) {
+    if (onBeforeNavigate && !onBeforeNavigate()) {
+      e.preventDefault();
+      return;
+    }
+    onClose();
+  }
 
   if (internalPath !== null) {
     return (
@@ -129,7 +145,7 @@ function NavItem({ item, currentPath, onClose, isFooter }: NavItemProps): ReactE
         {dot}
         <Link
           to={internalPath}
-          onClick={onClose}
+          onClick={handleClick}
           aria-current={isCurrent ? 'page' : undefined}
           className={linkClass}
         >
@@ -142,16 +158,22 @@ function NavItem({ item, currentPath, onClose, isFooter }: NavItemProps): ReactE
   return (
     <li className="flex items-center">
       {dot}
-      <a href={item.href} onClick={onClose} className={linkClass}>
+      <a href={item.href} onClick={handleClick} className={linkClass}>
         {item.label}
       </a>
     </li>
   );
 }
 
-export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): ReactElement {
+export function MenuPanel({
+  sections,
+  currentPath,
+  isOpen,
+  onClose,
+  onBeforeNavigate,
+}: Props): ReactElement {
   const navRef = useRef<HTMLElement>(null);
-  useFocusTrap(navRef, isOpen);
+  useFocusTrap(navRef, isOpen, onClose);
 
   return (
     <nav
@@ -235,7 +257,7 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
         {/* Header: raked-circle mark beside the wordmark */}
         <header className="flex items-center gap-3 mb-8 [color:var(--muted)]">
           <RakedCircleMark />
-          <span className="text-[14px] font-light [letter-spacing:0.15em] [color:var(--text)] leading-none">
+          <span className="text-sm font-light [letter-spacing:0.15em] [color:var(--text)] leading-none">
             Hunting for Carrots
           </span>
         </header>
@@ -243,13 +265,14 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
         {/* Navigation sections — 32px gap between sections (--space-lg) */}
         {sections.map((section, sectionIndex) => {
           const isFooterSection = sectionIndex === sections.length - 1;
+          const sectionKey = section.heading ?? section.items[0]?.label ?? String(sectionIndex);
           return (
             <div
-              key={section.heading ?? section.items[0]?.label}
+              key={sectionKey}
               className={isFooterSection ? 'mt-auto' : sectionIndex > 0 ? 'mt-8' : ''}
             >
               {section.heading !== undefined && (
-                <p className="text-[13px] font-light [letter-spacing:0.12em] [color:var(--muted)] mb-3">
+                <p className="text-[11px] font-light [letter-spacing:0.12em] [color:var(--muted)] mb-3">
                   {section.heading}
                 </p>
               )}
@@ -260,6 +283,7 @@ export function MenuPanel({ sections, currentPath, isOpen, onClose }: Props): Re
                     item={item}
                     currentPath={currentPath}
                     onClose={onClose}
+                    onBeforeNavigate={onBeforeNavigate}
                     isFooter={isFooterSection}
                   />
                 ))}

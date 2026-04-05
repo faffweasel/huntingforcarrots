@@ -1,13 +1,15 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, Ref } from 'react';
 
 interface Props {
   readonly isOpen: boolean;
   readonly onClick: () => void;
+  readonly ref?: Ref<HTMLButtonElement>;
 }
 
-export function MenuTrigger({ isOpen, onClick }: Props): ReactElement {
+export function MenuTrigger({ isOpen, onClick, ref }: Props): ReactElement {
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       aria-label={isOpen ? 'Close site navigation' : 'Open site navigation'}
@@ -62,7 +64,7 @@ export function MenuTrigger({ isOpen, onClick }: Props): ReactElement {
             strokeLinecap="round"
           />
         </g>
-        {/* Two diagonal lines — close × */}
+        {/* Two diagonal lines — close x */}
         <g className="transition-opacity duration-150" style={{ opacity: isOpen ? 1 : 0 }}>
           <line
             x1="6"

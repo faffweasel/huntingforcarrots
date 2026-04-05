@@ -19,18 +19,21 @@ function getFocusable(container: HTMLElement): HTMLElement[] {
  *
  * On activate:  saves the previously focused element and moves focus to
  *               the first focusable element inside the container.
- * While active: Tab wraps from last → first; Shift+Tab wraps from first → last.
+ * While active: Tab wraps from last to first; Shift+Tab wraps from first to last.
+ *               Escape calls `onEscape` if provided.
  * On deactivate: restores focus to the element that was active before activation.
  */
-export function useFocusTrap(containerRef: RefObject<HTMLElement | null>, isActive: boolean): void {
+export function useFocusTrap(
+  containerRef: RefObject<HTMLElement | null>,
+  isActive: boolean,
+  onEscape?: () => void
+): void {
   const previousFocusRef = useRef<Element | null>(null);
 
   // Save focus on activate; restore on deactivate.
   useEffect(() => {
     if (isActive) {
       previousFocusRef.current = document.activeElement;
-      // Move focus to the first panel element after the DOM has updated
-      // (inert attribute is removed before effects run, so focus is allowed).
       if (containerRef.current) {
         getFocusable(containerRef.current)[0]?.focus();
       }
@@ -41,12 +44,18 @@ export function useFocusTrap(containerRef: RefObject<HTMLElement | null>, isActi
     }
   }, [isActive, containerRef]);
 
-  // Tab trap: intercept Tab/Shift+Tab at the boundaries and wrap focus.
+  // Tab trap + Escape handling.
   useEffect(() => {
     if (!isActive || !containerRef.current) return;
     const container = containerRef.current;
 
     const handleKeyDown = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape' && onEscape) {
+        e.preventDefault();
+        onEscape();
+        return;
+      }
+
       if (e.key !== 'Tab') return;
 
       const focusable = getFocusable(container);
@@ -56,13 +65,11 @@ export function useFocusTrap(containerRef: RefObject<HTMLElement | null>, isActi
       const last = focusable[focusable.length - 1];
 
       if (e.shiftKey) {
-        // Shift+Tab at first element → jump to last
         if (document.activeElement === first) {
           e.preventDefault();
           last.focus();
         }
       } else {
-        // Tab at last element → jump to first
         if (document.activeElement === last) {
           e.preventDefault();
           first.focus();
@@ -72,5 +79,5 @@ export function useFocusTrap(containerRef: RefObject<HTMLElement | null>, isActi
 
     container.addEventListener('keydown', handleKeyDown);
     return () => container.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, containerRef]);
+  }, [isActive, containerRef, onEscape]);
 }

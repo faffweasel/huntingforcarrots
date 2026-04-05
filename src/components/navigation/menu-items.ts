@@ -28,6 +28,14 @@ export const menuSections: readonly MenuSection[] = [
     ],
   },
   {
-    items: [{ label: 'About', href: '/about', external: false, status: 'active' }],
+    items: [
+      { label: 'About', href: '/about', external: false, status: 'active' },
+      {
+        label: 'Privacy',
+        href: '/privacy',
+        external: false,
+        status: 'active',
+      },
+    ],
   },
 ] as const;

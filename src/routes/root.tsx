@@ -5,6 +5,7 @@ import { MenuPanel } from '../components/navigation/MenuPanel';
 import { MenuTrigger } from '../components/navigation/MenuTrigger';
 import { menuSections } from '../components/navigation/menu-items';
 import { Timer } from '../components/timer/Timer';
+import { NotFound } from './not-found';
 
 function RootLayout(): ReactElement {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,4 +65,5 @@ function RootLayout(): ReactElement {
 
 export const rootRoute = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFound,
 });

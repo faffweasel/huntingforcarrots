@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { type ReactElement, useEffect, useState } from 'react';
 import type { Haiku } from '../../lib/haiku';
 
 interface HaikuOverlayProps {
@@ -19,6 +19,29 @@ const PAD_RIGHT = 80;
 const TEXT_HALF_W = 140;
 const TEXT_HALF_H = 60;
 
+const RESIZE_DEBOUNCE_MS = 150;
+
+function useViewportSize(): { readonly width: number; readonly height: number } {
+  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    function handleResize() {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setSize({ width: window.innerWidth, height: window.innerHeight });
+      }, RESIZE_DEBOUNCE_MS);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return size;
+}
+
 /**
  * Converts a viewBox coordinate to viewport pixels,
  * matching the SVG's preserveAspectRatio="xMidYMid slice".
@@ -27,10 +50,10 @@ function toViewportPixels(
   vbX: number,
   vbY: number,
   vbW: number,
-  vbH: number
+  vbH: number,
+  vpW: number,
+  vpH: number
 ): { x: number; y: number } {
-  const vpW = window.innerWidth;
-  const vpH = window.innerHeight;
   const scale = Math.max(vpW / vbW, vpH / vbH);
   const offsetX = (vpW - vbW * scale) / 2;
   const offsetY = (vpH - vbH * scale) / 2;
@@ -42,14 +65,16 @@ function toViewportPixels(
 
 /**
  * Clamps the haiku centre so the full text block stays within safe bounds:
- *   top ≥ PAD_TOP, bottom ≤ vpH − PAD_BOTTOM,
- *   left ≥ PAD_LEFT, right ≤ vpW − PAD_RIGHT.
+ *   top ≥ PAD_TOP, bottom ≤ vpH - PAD_BOTTOM,
+ *   left ≥ PAD_LEFT, right ≤ vpW - PAD_RIGHT.
  * Falls back to viewport centre if the safe zone is too small (tiny viewport).
  */
-function clampCenter(cx: number, cy: number): { x: number; y: number } {
-  const vpW = window.innerWidth;
-  const vpH = window.innerHeight;
-
+function clampCenter(
+  cx: number,
+  cy: number,
+  vpW: number,
+  vpH: number
+): { x: number; y: number } {
   const minX = PAD_LEFT + TEXT_HALF_W;
   const maxX = vpW - PAD_RIGHT - TEXT_HALF_W;
   const minY = PAD_TOP + TEXT_HALF_H;
@@ -67,10 +92,13 @@ function clampCenter(cx: number, cy: number): { x: number; y: number } {
 }
 
 export function HaikuOverlay({ haiku, position, viewBox }: HaikuOverlayProps): ReactElement {
-  const pixel = toViewportPixels(position.x, position.y, viewBox.width, viewBox.height);
-  const clamped = clampCenter(pixel.x, pixel.y);
-  const left = (clamped.x / window.innerWidth) * 100;
-  const top = (clamped.y / window.innerHeight) * 100;
+  const viewport = useViewportSize();
+  const pixel = toViewportPixels(
+    position.x, position.y, viewBox.width, viewBox.height, viewport.width, viewport.height
+  );
+  const clamped = clampCenter(pixel.x, pixel.y, viewport.width, viewport.height);
+  const left = (clamped.x / viewport.width) * 100;
+  const top = (clamped.y / viewport.height) * 100;
 
   return (
     <div

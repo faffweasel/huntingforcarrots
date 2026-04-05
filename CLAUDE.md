@@ -21,7 +21,7 @@ npm run dev          # Vite dev server
 npm run build        # Production build → dist/
 npm run preview      # Preview production build locally
 npm run check        # Biome lint + format check
-npm run check:fix    # Biome auto-fix
+npm run format       # Biome auto-format
 ```
 
 ## TypeScript
@@ -219,6 +219,7 @@ Fragment composition, not word-level slot-filling. Three banks of curated line f
 - No default exports. Named exports everywhere.
 - Components: one component per file, filename matches export name.
 - Commit messages: imperative mood, one logical unit per commit.
+- `console.log` is permitted behind `import.meta.env.DEV` gate for garden generation diagnostics. These are tree-shaken from production builds.
 - Git stays manual. Never commit or push from Claude Code.
 
 ## Do NOT

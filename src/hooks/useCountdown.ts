@@ -84,12 +84,14 @@ export function useCountdown(onComplete: () => void): UseCountdownReturn {
     clearTimeout(intervalRef.current);
     setRunning(false);
     setPaused(true);
+    setLiveText('Timer paused');
   }
 
   function resume() {
     clearTimeout(intervalRef.current);
     setRunning(true);
     setPaused(false);
+    setLiveText('Timer resumed');
   }
 
   function stop() {

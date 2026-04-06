@@ -121,6 +121,13 @@
   }
 }
 
+button,
+a,
+[role="button"],
+[tabindex] {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   background: var(--bg);
   color: var(--text);

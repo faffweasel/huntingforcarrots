@@ -104,11 +104,11 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   // ── Actions ───────────────────────────────────────────────────────────
 
   function handleStart() {
+    // ensureAudio + strikeBegin must both run synchronously in the click
+    // handler call stack — iOS WebKit drops audio started in .then() callbacks
+    audio.ensureAudio();
     countdown.start(wheel.duration * 60);
-    // Fire-and-forget: ensureAudio resolves the AudioContext (created on this
-    // user gesture) then strikes the bell.  State updates above are synchronous
-    // so React removes the Start button before a second click can land.
-    void audio.ensureAudio().then(() => audio.strikeBegin());
+    audio.strikeBegin();
   }
 
   function handlePause() {
@@ -116,7 +116,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   }
 
   function handleResume() {
-    void audio.ensureAudio();
+    audio.ensureAudio();
     countdown.resume();
   }
 
@@ -168,7 +168,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
   const actionBtnClass =
     'flex items-center justify-center w-11 h-11 bg-transparent border-0 cursor-pointer p-0 ' +
-    '[color:var(--muted)] hover:[color:var(--text)] transition-colors duration-150';
+    '[color:var(--muted)] hover:[color:var(--text)] transition-colors duration-150 focus-visible:outline-none';
 
   const numberStyle = {
     fontSize: 32,
@@ -244,7 +244,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   ref={countdownRef}
                   role="timer"
                   tabIndex={-1}
-                  className="relative flex items-center justify-center"
+                  className="relative flex items-center justify-center outline-none"
                 >
                   <span style={numberStyle}>{formatTime(countdown.remaining)}</span>
                 </div>
@@ -259,7 +259,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   aria-valuenow={wheel.displayValue}
                   aria-valuetext={`${wheel.displayValue} minutes`}
                   onKeyDown={wheel.handleSpinKeyDown}
-                  className="relative flex flex-col items-center justify-center gap-1 cursor-ns-resize select-none"
+                  className="relative flex flex-col items-center justify-center gap-1 cursor-ns-resize select-none focus-visible:outline-none"
                   style={{ width: DIAL_SIZE, height: DIAL_SIZE }}
                 >
                   {wheel.editing ? (
@@ -273,7 +273,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                       onBlur={wheel.commitEdit}
                       onKeyDown={wheel.handleEditKeyDown}
                       aria-label="Timer duration in minutes"
-                      className="leading-none bg-transparent border-0 text-center p-0 m-0"
+                      className="leading-none bg-transparent border-0 text-center p-0 m-0 select-none [-webkit-appearance:none]"
                       style={{
                         ...numberStyle,
                         width: 80,
@@ -291,7 +291,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                         border: 'none',
                         padding: 0,
                       }}
-                      className="leading-none min-w-[44px] min-h-[44px]"
+                      className="leading-none min-w-[44px] min-h-[44px] select-none"
                       onClick={wheel.handleNumberClick}
                       aria-label={`${wheel.displayValue} minutes — click to edit`}
                     >
@@ -363,7 +363,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                 onClick={onToggle}
                 aria-label="Close meditation timer"
                 aria-expanded={true}
-                className="flex items-center justify-center w-11 h-11 bg-transparent border-0 cursor-pointer p-0 transition-colors duration-150"
+                className="flex items-center justify-center w-11 h-11 bg-transparent border-0 cursor-pointer p-0 transition-colors duration-150 focus-visible:outline-none"
                 style={{ color: 'var(--text)' }}
               >
                 <svg
@@ -384,10 +384,16 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
         <button
           ref={iconRef}
           type="button"
-          onClick={onToggle}
+          onClick={() => {
+            // Preload audio on panel open — this tap is a user gesture so
+            // iOS WebKit allows AudioContext creation and resume here.
+            // By the time the user presses Begin, buffers should be ready.
+            audio.ensureAudio();
+            onToggle();
+          }}
           aria-label="Open meditation timer"
           aria-expanded={false}
-          className={`fixed bottom-6 right-6 z-10 flex flex-col items-center justify-center w-11 min-h-[44px] bg-transparent border-0 cursor-pointer p-0 hover:[color:var(--text)] transition-colors duration-150 ${countdown.pulsing ? '[color:var(--text)]' : '[color:var(--muted)]'}`}
+          className={`fixed bottom-6 right-6 z-10 flex flex-col items-center justify-center w-11 min-h-[44px] bg-transparent border-0 cursor-pointer p-0 hover:[color:var(--text)] transition-colors duration-150 focus-visible:outline-none ${countdown.pulsing ? '[color:var(--text)]' : '[color:var(--muted)]'}`}
         >
           <svg
             width={ICON_SIZE}

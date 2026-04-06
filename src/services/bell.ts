@@ -1,34 +1,25 @@
-export interface BellBuffers {
-  readonly begin: AudioBuffer;
-  readonly complete: AudioBuffer;
-}
-
-async function fetchAndDecode(audioContext: AudioContext, url: string): Promise<AudioBuffer> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
-  const arrayBuffer = await response.arrayBuffer();
-  return audioContext.decodeAudioData(arrayBuffer);
+export interface Bells {
+  readonly begin: HTMLAudioElement;
+  readonly complete: HTMLAudioElement;
 }
 
 /**
- * Fetches and decodes both singing bowl samples.
- * Call once on first user gesture, cache the returned buffers.
+ * Creates and preloads both singing bowl Audio elements.
+ * Call once on first user gesture, cache the returned object.
  */
-export async function loadBells(audioContext: AudioContext): Promise<BellBuffers> {
-  const [begin, complete] = await Promise.all([
-    fetchAndDecode(audioContext, '/audio/bell-begin.mp3'),
-    fetchAndDecode(audioContext, '/audio/bell-complete.mp3'),
-  ]);
+export function loadBells(): Bells {
+  const begin = new Audio('/audio/bell-begin.mp3');
+  const complete = new Audio('/audio/bell-complete.mp3');
+  begin.load();
+  complete.load();
   return { begin, complete };
 }
 
 /**
- * Plays a singing bowl sample. The source node is fire-and-forget —
- * it disconnects and is garbage-collected after playback ends.
+ * Plays a singing bowl sample from the start.
+ * Safe to call while already playing (rewinds first).
  */
-export function strikeBell(audioContext: AudioContext, buffer: AudioBuffer): void {
-  const source = audioContext.createBufferSource();
-  source.buffer = buffer;
-  source.connect(audioContext.destination);
-  source.start();
+export function strikeBell(audio: HTMLAudioElement): void {
+  audio.currentTime = 0;
+  audio.play();
 }

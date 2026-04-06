@@ -17,8 +17,7 @@ function PrivacyPage(): ReactElement {
 
         <div className="font-normal text-base leading-[1.6] [color:var(--text)] text-left">
           <p className="[margin:0_0_var(--space-lg)]">
-            This site is operated by Faffweasel Industries, a one-person software operation based in
-            the United Kingdom.
+            This site is operated by Faffweasel Industries.
           </p>
 
           <p className="[margin:0_0_var(--space-lg)]">

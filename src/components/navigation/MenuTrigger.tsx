@@ -15,7 +15,7 @@ export function MenuTrigger({ isOpen, onClick, ref }: Props): ReactElement {
       aria-label={isOpen ? 'Close site navigation' : 'Open site navigation'}
       aria-expanded={isOpen}
       aria-controls="site-nav-panel"
-      className="fixed left-6 z-10 flex items-center justify-center w-11 h-11 border-0 bg-transparent cursor-pointer p-0 [color:var(--muted)] hover:[color:var(--text)] transition-colors duration-150"
+      className="fixed left-6 z-10 flex items-center justify-center w-11 h-11 border-0 bg-transparent cursor-pointer p-0 [color:var(--muted)] hover:[color:var(--text)] focus-visible:outline-none transition-colors duration-150"
       style={{ top: 'calc(24px + env(safe-area-inset-top, 0px))' }}
     >
       <span

@@ -15,33 +15,64 @@ export function useAudio(): UseAudioReturn {
   const bellsRef = useRef<BellBuffers | null>(null);
   const loadFailed = useRef(false);
   const lastAttemptRef = useRef(0);
+  const unlockedRef = useRef(false);
 
-  async function ensureAudio(): Promise<void> {
+  /**
+   * Call synchronously from a user gesture handler.
+   * resume() and the silent-buffer iOS unlock run in the
+   * synchronous call stack; buffer loading is async after.
+   */
+  function ensureAudio(): Promise<void> {
     if (!ctxRef.current) ctxRef.current = new AudioContext();
-    if (!bellsRef.current) {
-      if (loadFailed.current) {
-        if (Date.now() - lastAttemptRef.current < RETRY_COOLDOWN_MS) return;
-      }
-      try {
-        lastAttemptRef.current = Date.now();
-        bellsRef.current = await loadBells(ctxRef.current);
+    const ctx = ctxRef.current;
+
+    // iOS WebKit requires resume() in the synchronous call stack
+    // of the user gesture — not after an await or inside .then()
+    ctx.resume();
+
+    // Play a silent buffer once to unlock audio on iOS
+    // (works around the hardware mute switch restriction)
+    if (!unlockedRef.current) {
+      const silent = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = silent;
+      src.connect(ctx.destination);
+      src.start();
+      unlockedRef.current = true;
+    }
+
+    if (bellsRef.current) return Promise.resolve();
+
+    if (loadFailed.current && Date.now() - lastAttemptRef.current < RETRY_COOLDOWN_MS) {
+      return Promise.resolve();
+    }
+
+    lastAttemptRef.current = Date.now();
+    return loadBells(ctx).then(
+      (buffers) => {
+        bellsRef.current = buffers;
         loadFailed.current = false;
-      } catch {
+      },
+      () => {
         loadFailed.current = true;
       }
-    }
-    if (ctxRef.current.state === 'suspended') await ctxRef.current.resume();
+    );
   }
 
   function strikeBegin(): void {
-    if (ctxRef.current && bellsRef.current) {
-      strikeBell(ctxRef.current, bellsRef.current.begin);
+    const ctx = ctxRef.current;
+    if (ctx && bellsRef.current) {
+      // Re-resume in case iOS suspended the context (e.g. tab backgrounded)
+      ctx.resume();
+      strikeBell(ctx, bellsRef.current.begin);
     }
   }
 
   function strikeComplete(): void {
-    if (ctxRef.current && bellsRef.current) {
-      strikeBell(ctxRef.current, bellsRef.current.complete);
+    const ctx = ctxRef.current;
+    if (ctx && bellsRef.current) {
+      ctx.resume();
+      strikeBell(ctx, bellsRef.current.complete);
     }
   }
 

@@ -14,8 +14,8 @@ function AboutPage(): ReactElement {
           <p className="[margin:0_0_var(--space-lg)]">
             A generative zen garden and a collection of reflective tools. Each visit creates a
             unique garden and haiku. No accounts, no tracking, no data collected. Just a quiet
-            space. The timer uses a real recording for the bell. The name is deliberate. There are
-            no carrots here.
+            space. The timer uses real recordings; the bell sounds were donated by a Zen monk. The
+            name is deliberate. There are no carrots here.
           </p>
 
           <p className="[margin:0_0_var(--space-lg)]">

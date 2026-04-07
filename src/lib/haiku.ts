@@ -6,6 +6,7 @@ import type {
   Season,
   SemanticCluster,
   Setting,
+  TimeOfDay,
 } from '../data/haiku-fragments';
 import { line1Fragments, line2Fragments, line3Fragments } from '../data/haiku-fragments';
 
@@ -21,12 +22,20 @@ const FALLBACK_HAIKU: Haiku = {
   line3: 'dust settles on wood',
 };
 
-const OPPOSITE_SEASON: Readonly<Record<Season, Season | null>> = {
-  spring: 'autumn',
-  autumn: 'spring',
-  summer: 'winter',
-  winter: 'summer',
-  none: null,
+const NEXT_SEASON: Readonly<Record<Season, Season>> = {
+  spring: 'summer',
+  summer: 'autumn',
+  autumn: 'winter',
+  winter: 'spring',
+  none: 'none',
+};
+
+const OPPOSITE_TIMES: Readonly<Record<TimeOfDay, readonly TimeOfDay[]>> = {
+  dawn: ['night', 'dusk'],
+  day: ['night'],
+  dusk: ['dawn'],
+  night: ['dawn', 'day'],
+  none: [],
 };
 
 const MAX_REROLLS = 10;
@@ -69,9 +78,15 @@ function sharedClusters(
   return result;
 }
 
-function isOppositeSeason(a: Season, b: Season): boolean {
+export function isSeasonForward(from: Season, to: Season): boolean {
+  if (from === 'none' || to === 'none') return true;
+  if (from === to) return true;
+  return NEXT_SEASON[from] === to;
+}
+
+export function isOppositeTimeOfDay(a: TimeOfDay, b: TimeOfDay): boolean {
   if (a === 'none' || b === 'none') return false;
-  return OPPOSITE_SEASON[a] === b;
+  return OPPOSITE_TIMES[a].includes(b);
 }
 
 function hasNounConflictAdjacent(a: readonly NounEntry[], b: readonly NounEntry[]): boolean {
@@ -171,7 +186,8 @@ function selectLine2(
   let pool = bank.filter(
     (f) =>
       sharesCluster(line1.clusters, f.clusters) &&
-      !isOppositeSeason(line1.season, f.season) &&
+      isSeasonForward(line1.season, f.season) &&
+      !isOppositeTimeOfDay(line1.time_of_day, f.time_of_day) &&
       !isJarringSettingTransition(line1.setting, f.setting) &&
       !hasNounConflictAdjacent(line1.nouns, f.nouns) &&
       !hasConceptualGroupConflict(line1.conceptual_group, f.conceptual_group)
@@ -181,6 +197,8 @@ function selectLine2(
     pool = bank.filter(
       (f) =>
         !hasNounConflictAdjacent(line1.nouns, f.nouns) &&
+        isSeasonForward(line1.season, f.season) &&
+        !isOppositeTimeOfDay(line1.time_of_day, f.time_of_day) &&
         !isJarringSettingTransition(line1.setting, f.setting)
     );
   }
@@ -205,7 +223,13 @@ function selectLine3(
       return false;
     }
 
-    if (isOppositeSeason(line1.season, f.season) || isOppositeSeason(line2.season, f.season)) {
+    if (!isSeasonForward(line2.season, f.season)) return false;
+    if (line2.season === 'none' && !isSeasonForward(line1.season, f.season)) return false;
+
+    if (
+      isOppositeTimeOfDay(line1.time_of_day, f.time_of_day) ||
+      isOppositeTimeOfDay(line2.time_of_day, f.time_of_day)
+    ) {
       return false;
     }
 
@@ -230,6 +254,10 @@ function selectLine3(
       (f) =>
         !hasNounConflictAdjacent(line2.nouns, f.nouns) &&
         !hasStrongNounConflict(line1.nouns, f.nouns) &&
+        isSeasonForward(line2.season, f.season) &&
+        (line2.season !== 'none' || isSeasonForward(line1.season, f.season)) &&
+        !isOppositeTimeOfDay(line1.time_of_day, f.time_of_day) &&
+        !isOppositeTimeOfDay(line2.time_of_day, f.time_of_day) &&
         !isJarringSettingTransition(line2.setting, f.setting)
     );
   }
@@ -244,6 +272,16 @@ function validateCombination(
   line2: Line2Fragment,
   line3: Line3Fragment
 ): boolean {
+  // Directional season check: seasons must move forward (spring→summer→autumn→winter→spring)
+  if (!isSeasonForward(line1.season, line2.season)) return false;
+  if (!isSeasonForward(line2.season, line3.season)) return false;
+  if (line2.season === 'none' && !isSeasonForward(line1.season, line3.season)) return false;
+
+  // Time-of-day check: opposite pairs rejected across all lines
+  if (isOppositeTimeOfDay(line1.time_of_day, line2.time_of_day)) return false;
+  if (isOppositeTimeOfDay(line2.time_of_day, line3.time_of_day)) return false;
+  if (isOppositeTimeOfDay(line1.time_of_day, line3.time_of_day)) return false;
+
   // Setting check: all three same → reject
   if (line1.setting === line2.setting && line2.setting === line3.setting) {
     return false;

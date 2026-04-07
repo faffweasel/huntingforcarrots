@@ -6,7 +6,7 @@ import type {
   SemanticCluster,
 } from '../data/haiku-fragments';
 import { line1Fragments, line2Fragments, line3Fragments } from '../data/haiku-fragments';
-import { generateHaiku, seasonFromSeed } from './haiku';
+import { generateHaiku, isOppositeTimeOfDay, isSeasonForward, seasonFromSeed } from './haiku';
 import { createPrng } from './prng';
 
 // Helper: build a PRNG from a numeric seed
@@ -226,97 +226,68 @@ describe('noun filtering', () => {
   });
 });
 
-// --- Season filtering ---
+// --- Directional season filtering ---
 
-describe('season filtering', () => {
-  it('summer L1 never pairs with winter L2 or L3', () => {
-    for (let seed = 0; seed < 100; seed++) {
-      const h = generateHaiku(prng(seed), '2026-07-01');
-      const { f1, f2, f3 } = getFragments(h);
-      if (!f1 || !f2 || !f3) continue;
-      if (f1.season === 'summer') {
-        expect(f2.season).not.toBe('winter');
-        expect(f3.season).not.toBe('winter');
-      }
-    }
+describe('directional season filtering', () => {
+  it('spring L1 + summer L2 → accepted (one step forward)', () => {
+    expect(isSeasonForward('spring', 'summer')).toBe(true);
   });
 
-  it('winter L1 never pairs with summer L2 or L3', () => {
-    for (let seed = 0; seed < 100; seed++) {
-      const h = generateHaiku(prng(seed), '2026-01-01');
-      const { f1, f2, f3 } = getFragments(h);
-      if (!f1 || !f2 || !f3) continue;
-      if (f1.season === 'winter') {
-        expect(f2.season).not.toBe('summer');
-        expect(f3.season).not.toBe('summer');
-      }
-    }
+  it('summer L1 + autumn L2 → accepted (one step forward)', () => {
+    expect(isSeasonForward('summer', 'autumn')).toBe(true);
   });
 
-  it('spring L1 never pairs with autumn L2 or L3', () => {
-    for (let seed = 0; seed < 100; seed++) {
-      const h = generateHaiku(prng(seed), '2026-04-01');
-      const { f1, f2, f3 } = getFragments(h);
-      if (!f1 || !f2 || !f3) continue;
-      if (f1.season === 'spring') {
-        expect(f2.season).not.toBe('autumn');
-        expect(f3.season).not.toBe('autumn');
-      }
-    }
+  it('autumn L1 + winter L2 → accepted (one step forward)', () => {
+    expect(isSeasonForward('autumn', 'winter')).toBe(true);
   });
 
-  it('autumn L1 never pairs with spring L2 or L3', () => {
-    for (let seed = 0; seed < 100; seed++) {
-      const h = generateHaiku(prng(seed), '2026-10-01');
-      const { f1, f2, f3 } = getFragments(h);
-      if (!f1 || !f2 || !f3) continue;
-      if (f1.season === 'autumn') {
-        expect(f2.season).not.toBe('spring');
-        expect(f3.season).not.toBe('spring');
-      }
-    }
+  it('winter L1 + spring L2 → accepted (wraps forward)', () => {
+    expect(isSeasonForward('winter', 'spring')).toBe(true);
   });
 
-  it('"none" season pairs with any other season', () => {
-    let foundNonePairedWithSeasonal = false;
-    for (let seed = 0; seed < 200; seed++) {
-      const h = generateHaiku(prng(seed), '2026-06-01');
-      const { f1, f2 } = getFragments(h);
-      if (!f1 || !f2) continue;
-      if (
-        (f1.season === 'none' && f2.season !== 'none') ||
-        (f2.season === 'none' && f1.season !== 'none')
-      ) {
-        foundNonePairedWithSeasonal = true;
-        break;
-      }
-    }
-    expect(foundNonePairedWithSeasonal).toBe(true);
+  it('summer L1 + spring L2 → rejected (backwards)', () => {
+    expect(isSeasonForward('summer', 'spring')).toBe(false);
   });
 
-  it('adjacent seasons (spring+summer, autumn+winter) are allowed', () => {
-    let foundAdjacent = false;
-    const adjacentPairs = new Set([
-      'spring-summer',
-      'summer-spring',
-      'summer-autumn',
-      'autumn-summer',
-      'autumn-winter',
-      'winter-autumn',
-      'winter-spring',
-      'spring-winter',
-    ]);
-    for (let seed = 0; seed < 500; seed++) {
-      const h = generateHaiku(prng(seed), '2026-04-01');
-      const { f1, f2 } = getFragments(h);
-      if (!f1 || !f2) continue;
-      const pair = `${f1.season}-${f2.season}`;
-      if (adjacentPairs.has(pair)) {
-        foundAdjacent = true;
-        break;
-      }
-    }
-    expect(foundAdjacent).toBe(true);
+  it('autumn L1 + summer L2 → rejected (backwards)', () => {
+    expect(isSeasonForward('autumn', 'summer')).toBe(false);
+  });
+
+  it('spring L1 + autumn L2 → rejected (two steps forward)', () => {
+    expect(isSeasonForward('spring', 'autumn')).toBe(false);
+  });
+
+  it('spring L1 + summer L2 + autumn L3 → accepted (each pair one step)', () => {
+    expect(isSeasonForward('spring', 'summer')).toBe(true);
+    expect(isSeasonForward('summer', 'autumn')).toBe(true);
+    // L1↔L3 check only applies when L2 is 'none'; with real L2, adjacent checks suffice
+  });
+
+  it('spring L1 + none L2 + autumn L3 → rejected (L1↔L3 two steps)', () => {
+    expect(isSeasonForward('spring', 'none')).toBe(true);
+    expect(isSeasonForward('none', 'autumn')).toBe(true);
+    expect(isSeasonForward('spring', 'autumn')).toBe(false);
+  });
+
+  it('spring L1 + none L2 + summer L3 → accepted (L1↔L3 one step)', () => {
+    expect(isSeasonForward('spring', 'none')).toBe(true);
+    expect(isSeasonForward('none', 'summer')).toBe(true);
+    expect(isSeasonForward('spring', 'summer')).toBe(true);
+  });
+
+  it('none L1 + any L2 + any L3 → season check passes (none is transparent)', () => {
+    expect(isSeasonForward('none', 'spring')).toBe(true);
+    expect(isSeasonForward('none', 'summer')).toBe(true);
+    expect(isSeasonForward('none', 'autumn')).toBe(true);
+    expect(isSeasonForward('none', 'winter')).toBe(true);
+    expect(isSeasonForward('none', 'none')).toBe(true);
+  });
+
+  it('same season across all three lines → accepted', () => {
+    expect(isSeasonForward('spring', 'spring')).toBe(true);
+    expect(isSeasonForward('summer', 'summer')).toBe(true);
+    expect(isSeasonForward('autumn', 'autumn')).toBe(true);
+    expect(isSeasonForward('winter', 'winter')).toBe(true);
   });
 });
 
@@ -496,6 +467,40 @@ describe('conceptual group filtering', () => {
         expect(f1.conceptual_group).not.toBe(f3.conceptual_group);
       }
     }
+  });
+});
+
+// --- Time-of-day filtering ---
+
+describe('time-of-day filtering', () => {
+  it('dawn L1 + night L2 → rejected', () => {
+    expect(isOppositeTimeOfDay('dawn', 'night')).toBe(true);
+  });
+
+  it('night L1 + dawn L2 → rejected', () => {
+    expect(isOppositeTimeOfDay('night', 'dawn')).toBe(true);
+  });
+
+  it('dawn L1 + day L2 → accepted', () => {
+    expect(isOppositeTimeOfDay('dawn', 'day')).toBe(false);
+  });
+
+  it('dusk L1 + night L2 → accepted', () => {
+    expect(isOppositeTimeOfDay('dusk', 'night')).toBe(false);
+  });
+
+  it('day L1 + night L2 → rejected', () => {
+    expect(isOppositeTimeOfDay('day', 'night')).toBe(true);
+  });
+
+  it('dawn L1 + none L2 + night L3 → rejected (L1↔L3 opposite)', () => {
+    expect(isOppositeTimeOfDay('dawn', 'night')).toBe(true);
+    expect(isOppositeTimeOfDay('dawn', 'none')).toBe(false);
+    expect(isOppositeTimeOfDay('none', 'night')).toBe(false);
+  });
+
+  it('none L1 + none L2 + none L3 → accepted', () => {
+    expect(isOppositeTimeOfDay('none', 'none')).toBe(false);
   });
 });
 

@@ -11,6 +11,8 @@
 
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter' | 'none';
 
+export type TimeOfDay = 'dawn' | 'day' | 'dusk' | 'night' | 'none';
+
 export type SemanticCluster =
   | 'water'
   | 'stone'
@@ -60,6 +62,7 @@ export type Line1Fragment = {
   readonly text: string;
   readonly syllables: 5;
   readonly season: Season;
+  readonly time_of_day: TimeOfDay;
   readonly clusters: readonly SemanticCluster[];
   readonly setting: Setting;
   readonly nouns: readonly NounEntry[];
@@ -70,6 +73,7 @@ export type Line2Fragment = {
   readonly text: string;
   readonly syllables: 7;
   readonly season: Season;
+  readonly time_of_day: TimeOfDay;
   readonly clusters: readonly SemanticCluster[];
   readonly setting: Setting;
   readonly nouns: readonly NounEntry[];
@@ -80,6 +84,7 @@ export type Line3Fragment = {
   readonly text: string;
   readonly syllables: 5;
   readonly season: Season;
+  readonly time_of_day: TimeOfDay;
   readonly clusters: readonly SemanticCluster[];
   readonly pivot: PivotType;
   readonly setting: Setting;
@@ -95,6 +100,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'soft dusk fills the room',
     syllables: 5,
     season: 'none',
+    time_of_day: 'dusk',
     clusters: ['light', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -106,6 +112,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the gate hangs open',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'natural',
     nouns: [{ word: 'gate', strength: 'weak' }],
@@ -114,6 +121,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'empty bowl holds light',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'light'],
     setting: 'domestic',
     nouns: [
@@ -125,6 +133,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the stone lantern stands',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -136,6 +145,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'worn tatami mats',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     setting: 'domestic',
     nouns: [{ word: 'tatami', strength: 'strong' }],
@@ -144,6 +154,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the old bell rings deep',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'time'],
     setting: 'natural',
     nouns: [{ word: 'bell', strength: 'strong' }],
@@ -153,6 +164,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the bridge spans the stream',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'water'],
     setting: 'natural',
     nouns: [
@@ -164,6 +176,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'stone steps worn and smooth',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'time'],
     setting: 'natural',
     nouns: [
@@ -175,6 +188,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the roof leaks, rain drips',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'domestic',
     nouns: [
@@ -186,6 +200,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'bark peels from the tree',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'natural',
     nouns: [
@@ -197,6 +212,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'vending machines glow',
     syllables: 5,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['light', 'absence'],
     setting: 'urban',
     nouns: [{ word: 'vending machines', strength: 'strong' }],
@@ -205,6 +221,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'concrete towers loom',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sky', 'stone'],
     setting: 'urban',
     nouns: [
@@ -216,6 +233,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a single bird calls',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     setting: 'natural',
     nouns: [{ word: 'bird', strength: 'weak' }],
@@ -224,6 +242,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a fox in headlights',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     setting: 'natural',
     nouns: [
@@ -235,6 +254,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the subway rumbles',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stone'],
     setting: 'urban',
     nouns: [{ word: 'subway', strength: 'strong' }],
@@ -244,6 +264,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'moss clings to the wall',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
@@ -255,6 +276,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'raked sand holds the light',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'light'],
     setting: 'natural',
     nouns: [
@@ -266,6 +288,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'rain on the grey stone',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     setting: 'natural',
     nouns: [
@@ -277,6 +300,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'soft rain on a tent',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'natural',
     nouns: [
@@ -288,6 +312,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'rain streaks down the glass',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'domestic',
     nouns: [
@@ -299,6 +324,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the temple holds still',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     setting: 'natural',
     nouns: [{ word: 'temple', strength: 'strong' }],
@@ -307,6 +333,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a cyclist rides by',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     setting: 'urban',
     nouns: [{ word: 'cyclist', strength: 'strong' }],
@@ -315,6 +342,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'ramen steam rises',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'urban',
     nouns: [
@@ -327,6 +355,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the neon signs blur',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'urban',
     nouns: [
@@ -338,6 +367,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'plastic flowers fade',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'domestic',
     nouns: [{ word: 'flowers', strength: 'weak' }],
@@ -347,6 +377,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'salarymen sleep',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'stillness'],
     setting: 'urban',
     nouns: [{ word: 'salarymen', strength: 'strong' }],
@@ -355,6 +386,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'ink on the paper',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'time'],
     setting: 'domestic',
     nouns: [
@@ -366,6 +398,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'rainfall on tin roofs',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'urban',
     nouns: [
@@ -377,6 +410,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the streetlights hum low',
     syllables: 5,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['sound', 'light'],
     setting: 'urban',
     nouns: [{ word: 'streetlights', strength: 'strong' }],
@@ -385,6 +419,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a motionless pond',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     setting: 'natural',
     nouns: [{ word: 'pond', strength: 'weak' }],
@@ -393,6 +428,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'warm broth and stale bread',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     setting: 'domestic',
     nouns: [
@@ -405,6 +441,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'dawn light through curtains',
     syllables: 5,
     season: 'none',
+    time_of_day: 'dawn',
     clusters: ['light'],
     setting: 'domestic',
     nouns: [
@@ -416,6 +453,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a grass hut for home',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'growth'],
     setting: 'natural',
     nouns: [
@@ -427,6 +465,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'geckos on the wall',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -438,6 +477,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'trash burns by the road',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'stone'],
     setting: 'urban',
     nouns: [
@@ -449,6 +489,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'weeds grow through concrete',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'urban',
     nouns: [
@@ -460,6 +501,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'stink bug in my hair',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -473,6 +515,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'city roosters call',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     setting: 'urban',
     nouns: [{ word: 'roosters', strength: 'strong' }],
@@ -481,6 +524,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'steam from the clay pot',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'domestic',
     nouns: [
@@ -492,6 +536,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'scooters clog the streets',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stone'],
     setting: 'urban',
     nouns: [
@@ -503,6 +548,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'old moss on new stone',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
@@ -514,6 +560,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'rain slips off slate roofs',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'urban',
     nouns: [
@@ -525,6 +572,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'sea wind blows on stone',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sky', 'stone'],
     setting: 'natural',
     nouns: [
@@ -536,6 +584,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'mist on the river',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sky'],
     setting: 'natural',
     nouns: [
@@ -547,6 +596,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the smell of old books',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     setting: 'domestic',
     nouns: [{ word: 'books', strength: 'strong' }],
@@ -555,6 +605,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'rats in the rubbish',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'urban',
     nouns: [
@@ -566,6 +617,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'light falls on the bridge',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'stone'],
     setting: 'natural',
     nouns: [
@@ -577,6 +629,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a crab in a pool',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -588,6 +641,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'dogs wait by the door',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -601,6 +655,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'bare earth drinks the rain',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     setting: 'natural',
     nouns: [
@@ -613,6 +668,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the earth smells of rain',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -624,6 +680,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'frogs hide in the reeds',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'water'],
     setting: 'natural',
     nouns: [
@@ -635,6 +692,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'children play in mud',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'water'],
     setting: 'natural',
     nouns: [
@@ -647,6 +705,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'airing the futon',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'domestic',
     nouns: [{ word: 'futon', strength: 'strong' }],
@@ -655,6 +714,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'snowdrops in the frost',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'water'],
     setting: 'natural',
     nouns: [
@@ -667,6 +727,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'mud stays on my boots',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['stone', 'growth'],
     setting: 'natural',
     nouns: [
@@ -682,6 +743,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'cleaning the kitchen',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['stillness', 'time'],
     setting: 'domestic',
     nouns: [{ word: 'kitchen', strength: 'strong' }],
@@ -690,6 +752,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'one daffodil wakes',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'daffodil', strength: 'strong' }],
@@ -701,6 +764,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the smell of cut grass',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'grass', strength: 'weak' }],
@@ -709,6 +773,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'long grass hides the path',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
@@ -720,6 +785,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the breeze stirs the grass',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky', 'growth'],
     setting: 'natural',
     nouns: [
@@ -731,6 +797,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: "a spider's silk thread",
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     setting: 'natural',
     nouns: [
@@ -742,6 +809,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'birds pass overhead',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky'],
     setting: 'natural',
     nouns: [{ word: 'birds', strength: 'weak' }],
@@ -750,6 +818,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a bee on the wind',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky', 'growth'],
     setting: 'natural',
     nouns: [
@@ -761,6 +830,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'missing the aircon',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'domestic',
     nouns: [{ word: 'aircon', strength: 'strong' }],
@@ -769,6 +839,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'lying in the grass',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'grass', strength: 'weak' }],
@@ -777,6 +848,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'heat haze on the cars',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'urban',
     nouns: [
@@ -788,6 +860,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'hiding in cafes',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'urban',
     nouns: [{ word: 'cafes', strength: 'strong' }],
@@ -796,6 +869,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'sun on a hot wall',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'stone'],
     setting: 'natural',
     nouns: [
@@ -807,6 +881,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'cool wind through the door',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky'],
     setting: 'domestic',
     nouns: [
@@ -818,6 +893,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'ice cubes in the glass',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'domestic',
     nouns: [
@@ -830,6 +906,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'sweat dripping from skin',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water'],
     setting: 'natural',
     nouns: [
@@ -841,6 +918,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'thunder in the air',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky', 'sound'],
     setting: 'natural',
     nouns: [
@@ -852,6 +930,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'bare feet on hot sand',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['stone'],
     setting: 'natural',
     nouns: [
@@ -864,6 +943,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'I begin to burn',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'natural',
     nouns: [
@@ -876,6 +956,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'woken by thunder',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sound', 'sky'],
     setting: 'domestic',
     nouns: [{ word: 'thunder', strength: 'weak' }],
@@ -884,6 +965,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'lightning through curtains',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'sky'],
     setting: 'domestic',
     nouns: [
@@ -897,6 +979,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a single leaf falls',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     setting: 'natural',
     nouns: [{ word: 'leaf', strength: 'strong' }],
@@ -905,6 +988,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the path fades in mist',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['stone', 'sky'],
     setting: 'natural',
     nouns: [
@@ -916,6 +1000,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'dry grass turns to gold',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'light'],
     setting: 'natural',
     nouns: [{ word: 'grass', strength: 'weak' }],
@@ -924,6 +1009,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'gold leaves, red jizo',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     setting: 'natural',
     nouns: [
@@ -935,6 +1021,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'clearing fallen leaves',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'natural',
     nouns: [{ word: 'leaves', strength: 'weak' }],
@@ -943,6 +1030,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'hunting for mushrooms',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'mushrooms', strength: 'strong' }],
@@ -951,6 +1039,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'first frost on the grass',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -963,6 +1052,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'bonfires in the dark',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'night',
     clusters: ['light'],
     setting: 'natural',
     nouns: [{ word: 'bonfires', strength: 'strong' }],
@@ -971,6 +1061,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'the dark clouds linger',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sky'],
     setting: 'natural',
     nouns: [{ word: 'clouds', strength: 'weak' }],
@@ -979,6 +1070,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'leaves crunch underfoot',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['stone', 'sound'],
     setting: 'natural',
     nouns: [{ word: 'leaves', strength: 'weak' }],
@@ -989,6 +1081,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a monk bows in snow',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     setting: 'natural',
     nouns: [
@@ -1001,6 +1094,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'cold wind bites the skin',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'natural',
     nouns: [
@@ -1012,6 +1106,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a robin perches',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stillness'],
     setting: 'natural',
     nouns: [{ word: 'robin', strength: 'strong' }],
@@ -1020,6 +1115,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'starlight spills on snow',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'night',
     clusters: ['light', 'water'],
     setting: 'natural',
     nouns: [
@@ -1031,6 +1127,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'an owl on the hunt',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sky', 'absence'],
     setting: 'natural',
     nouns: [{ word: 'owl', strength: 'strong' }],
@@ -1039,6 +1136,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'a log for the fire',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -1051,6 +1149,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'building a snowman',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [{ word: 'snowman', strength: 'strong' }],
@@ -1059,6 +1158,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'snow falls onto stone',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     setting: 'natural',
     nouns: [
@@ -1071,6 +1171,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'frost on the window',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'domestic',
     nouns: [
@@ -1083,6 +1184,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'breath hangs in the air',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'natural',
     nouns: [
@@ -1094,6 +1196,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'fire warms my cold hearth',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -1109,6 +1212,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'lost footprints in snow',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'natural',
     nouns: [
@@ -1120,6 +1224,7 @@ export const line1Fragments: readonly Line1Fragment[] = [
     text: 'frost cracks underfoot',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stone', 'sound'],
     setting: 'natural',
     nouns: [{ word: 'frost', strength: 'weak' }],
@@ -1135,6 +1240,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'ink flows across the paper',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1146,6 +1252,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'candles flicker in darkness',
     syllables: 7,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['light', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -1157,6 +1264,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a bell rings for more zazen',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -1169,6 +1277,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'wiping dust from this statue',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stone'],
     setting: 'natural',
     nouns: [
@@ -1180,6 +1289,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'bringing tea from the kitchen',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1192,6 +1302,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'cat scratches on the floorboards',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1204,6 +1315,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'chanting sutras in the night',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -1215,6 +1327,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'dust drifting in the sunlight',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1226,6 +1339,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'this stone buddha is watching',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1237,6 +1351,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'cars rushing through dark tunnels',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1248,6 +1363,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'old woman selling flowers',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'urban',
     nouns: [
@@ -1260,6 +1376,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a rat runs across the street',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1271,6 +1388,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'sun setting behind the smoke',
     syllables: 7,
     season: 'none',
+    time_of_day: 'dusk',
     clusters: ['light', 'sky'],
     setting: 'natural',
     nouns: [
@@ -1282,6 +1400,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'umbrellas clash in the storm',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'sky'],
     setting: 'urban',
     nouns: [
@@ -1293,6 +1412,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'dust settles on unswept floors',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1304,6 +1424,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'cobwebs drape from dusty shelves',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1315,6 +1436,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'sirens echo through the streets',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1326,6 +1448,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'running past monks with headphones',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stillness'],
     setting: 'urban',
     nouns: [
@@ -1338,6 +1461,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'street vendors selling banh mi',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'sound'],
     setting: 'urban',
     nouns: [
@@ -1349,6 +1473,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'salt air catching in the sails',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sky', 'water'],
     setting: 'natural',
     nouns: [
@@ -1360,6 +1485,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the rivers slow in the heat',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1371,6 +1497,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the dry pond ripples no more',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     setting: 'natural',
     nouns: [{ word: 'pond', strength: 'weak' }],
@@ -1379,6 +1506,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'old toys are left to the dust',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1390,6 +1518,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: "my wet touchscreen doesn't work",
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'domestic',
     nouns: [
@@ -1404,6 +1533,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'someone drops coins in the jar',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     setting: 'domestic',
     nouns: [
@@ -1415,6 +1545,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a book falling from the shelf',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     setting: 'domestic',
     nouns: [
@@ -1426,6 +1557,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'change jingles in my pocket',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     setting: 'domestic',
     nouns: [
@@ -1440,6 +1572,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the incense burns at the shrine',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     setting: 'natural',
     nouns: [
@@ -1451,6 +1584,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the toddler falls then stands up',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'domestic',
     nouns: [{ word: 'toddler', strength: 'strong' }],
@@ -1459,6 +1593,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'bamboo sways near the roadworks',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'sky'],
     setting: 'urban',
     nouns: [
@@ -1470,6 +1605,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'temple chants mix with traffic',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stillness'],
     setting: 'urban',
     nouns: [
@@ -1482,6 +1618,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'incense mixing with car fumes',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     setting: 'urban',
     nouns: [
@@ -1493,6 +1630,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a child bows twice then claps twice',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'sound'],
     setting: 'natural',
     nouns: [{ word: 'child', strength: 'strong' }],
@@ -1502,6 +1640,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'one old man in a chapel',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -1513,6 +1652,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'waiting for sheep on the road',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1524,6 +1664,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'screens glow behind paper walls',
     syllables: 7,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['light', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -1536,6 +1677,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'an old monk checks his iPhone',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -1548,6 +1690,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'bright souvenirs sold by monks',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'urban',
     nouns: [
@@ -1560,6 +1703,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'school buses pass the temple',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stillness'],
     setting: 'urban',
     nouns: [
@@ -1572,6 +1716,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'stopping for ducks in the road',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1583,6 +1728,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the crowd in the train stays still',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     setting: 'urban',
     nouns: [
@@ -1595,6 +1741,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'school shoes squeak on the shop floor',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1607,6 +1754,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a fox, watching from the hedge',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1618,6 +1766,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'I wake to the sound of rain',
     syllables: 7,
     season: 'none',
+    time_of_day: 'dawn',
     clusters: ['sound', 'water'],
     setting: 'domestic',
     nouns: [
@@ -1631,6 +1780,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'I watch the monk check the clock',
     syllables: 7,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     setting: 'domestic',
     nouns: [
@@ -1648,6 +1798,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'bluebells shoot from forest floors',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -1659,6 +1810,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the morning sun melting frost',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'dawn',
     clusters: ['light', 'water'],
     setting: 'natural',
     nouns: [
@@ -1671,6 +1823,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a bee for the first flower',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -1683,6 +1836,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: "the kite tugs at the string's end",
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['sky'],
     setting: 'natural',
     nouns: [
@@ -1694,6 +1848,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'young deer grazing on fresh shoots',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -1705,6 +1860,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'new leaves catch the morning dew',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'water'],
     setting: 'natural',
     nouns: [
@@ -1716,6 +1872,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'mud clinging to little boots',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['stone', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1728,6 +1885,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'blossoms fall on the rail line',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1740,6 +1898,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'plastic frogs wait by the pond',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'water'],
     setting: 'natural',
     nouns: [
@@ -1751,6 +1910,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'rain soaks into temple moss',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1763,6 +1923,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'new leaves covering street signs',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1774,6 +1935,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'running through fallen blossom',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'blossom', strength: 'weak' }],
@@ -1783,6 +1945,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'small wellies stomp in puddles',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'natural',
     nouns: [
@@ -1795,6 +1958,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a robin sings from the birch',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['sound', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1806,6 +1970,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'green leaves unfurl against grey',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'sky'],
     setting: 'natural',
     nouns: [{ word: 'leaves', strength: 'weak' }],
@@ -1814,6 +1979,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the air smells of wet green things',
     syllables: 7,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [{ word: 'air', strength: 'weak' }],
@@ -1824,6 +1990,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'fireflies blink in the dark grass',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'night',
     clusters: ['light', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1835,6 +2002,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a fan spins in the sea breeze',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky'],
     setting: 'domestic',
     nouns: [
@@ -1846,6 +2014,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'heat shimmers above the road',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1857,6 +2026,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'an ice cream melts on the path',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     setting: 'urban',
     nouns: [
@@ -1868,6 +2038,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'children fight over the swings',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sound', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1880,6 +2051,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a smartphone too hot to touch',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'domestic',
     nouns: [{ word: 'smartphone', strength: 'strong' }],
@@ -1889,6 +2061,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the boat drifts on still water',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     setting: 'natural',
     nouns: [
@@ -1900,6 +2073,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'children splash in the cool stream',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'natural',
     nouns: [
@@ -1912,6 +2086,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a girl draws with coloured chalk',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light'],
     setting: 'urban',
     nouns: [
@@ -1923,6 +2098,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'boys playing with a flat ball',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -1934,6 +2110,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'plastic stools line the sidewalk',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['stone'],
     setting: 'urban',
     nouns: [
@@ -1945,6 +2122,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'sun hats sell out before rain',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'light'],
     setting: 'urban',
     nouns: [
@@ -1956,6 +2134,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'cicadas scream from oak trees',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sound', 'growth'],
     setting: 'natural',
     nouns: [
@@ -1967,6 +2146,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'sunlight bleaches fading chairs',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'time'],
     setting: 'domestic',
     nouns: [
@@ -1978,6 +2158,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the aircon hum stops my sleep',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     setting: 'domestic',
     nouns: [
@@ -1991,6 +2172,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'small hands gripping their first bike',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -2003,6 +2185,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'plastic swords clash in the yard',
     syllables: 7,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sound'],
     setting: 'domestic',
     nouns: [
@@ -2016,6 +2199,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'roof tiles catching fallen leaves',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['stone', 'growth'],
     setting: 'domestic',
     nouns: [
@@ -2027,6 +2211,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a maple blocking my view',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth'],
     setting: 'natural',
     nouns: [
@@ -2040,6 +2225,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'fallen fruit left rotting now',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'natural',
     nouns: [{ word: 'fruit', strength: 'strong' }],
@@ -2048,6 +2234,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'leaves swirling down an old path',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
@@ -2059,6 +2246,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a single leaf lands on stone',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'natural',
     nouns: [
@@ -2070,6 +2258,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the wind tugs at yellow leaves',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sky', 'growth'],
     setting: 'natural',
     nouns: [
@@ -2081,6 +2270,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the storm rattles the windows',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sound', 'sky'],
     setting: 'domestic',
     nouns: [
@@ -2092,6 +2282,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'rain soaks the fallen chestnuts',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -2104,6 +2295,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'red leaves fall on the crosswalk',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     setting: 'urban',
     nouns: [
@@ -2115,6 +2307,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'chestnuts roasting in the rain',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     setting: 'natural',
     nouns: [
@@ -2127,6 +2320,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a squirrel hides one last nut',
     syllables: 7,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'time'],
     setting: 'natural',
     nouns: [
@@ -2140,6 +2334,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'the cat sleeps next to the fire',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stillness', 'light'],
     setting: 'domestic',
     nouns: [
@@ -2152,6 +2347,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'snow falling on wooden steps',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     setting: 'natural',
     nouns: [
@@ -2164,6 +2360,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'hot cars melting falling snow',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stone', 'water'],
     setting: 'urban',
     nouns: [
@@ -2176,6 +2373,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'wind howls through the empty street',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sky', 'absence'],
     setting: 'urban',
     nouns: [
@@ -2187,6 +2385,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'ice dripping from the gutter',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'urban',
     nouns: [
@@ -2199,6 +2398,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'snow drifts against bolted doors',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence', 'water'],
     setting: 'natural',
     nouns: [
@@ -2211,6 +2411,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'light hits the ice as I fall',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['light', 'water'],
     setting: 'natural',
     nouns: [
@@ -2225,6 +2426,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'cold seeping through the floorboards',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     setting: 'domestic',
     nouns: [{ word: 'floorboards', strength: 'strong' }],
@@ -2233,6 +2435,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'bare branches tap against glass',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sound', 'growth'],
     setting: 'natural',
     nouns: [
@@ -2244,6 +2447,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'ice cracks on the frozen pond',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'sound'],
     setting: 'natural',
     nouns: [
@@ -2256,6 +2460,7 @@ export const line2Fragments: readonly Line2Fragment[] = [
     text: 'a lone crow calls from the wire',
     syllables: 7,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sky', 'sound'],
     setting: 'urban',
     nouns: [
@@ -2273,6 +2478,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'dust settles on wood',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2285,6 +2491,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'another lost glove',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'urban',
@@ -2294,6 +2501,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the train pulls away',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'time'],
     pivot: 'time-shift',
     setting: 'urban',
@@ -2304,6 +2512,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: "the bell's echo fades",
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -2314,6 +2523,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'quiet settles here',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -2323,6 +2533,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the tide slips away',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'time'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -2332,6 +2543,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'bare earth, nothing more',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stone', 'absence'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -2342,6 +2554,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no signal remains',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -2351,6 +2564,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a grey heron waits',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     pivot: 'observer',
     setting: 'natural',
@@ -2360,6 +2574,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a screen watches you',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2370,6 +2585,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'someone left behind',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'urban',
@@ -2379,6 +2595,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: "a monk's watch stops still",
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2392,6 +2609,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the train doors open',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2405,6 +2623,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a bell, then nothing',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     pivot: 'absence',
     setting: 'natural',
@@ -2415,6 +2634,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'someone once stood here',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'observer',
     setting: 'natural',
@@ -2424,6 +2644,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no one to see this',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'natural',
@@ -2433,6 +2654,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'where is it I go?',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'question',
     setting: 'natural',
@@ -2446,6 +2668,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'this old robe hangs loose',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -2455,6 +2678,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'nothing new remains',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -2464,6 +2688,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'just this bowl of tea',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2477,6 +2702,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the red light turns green',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light'],
     pivot: 'time-shift',
     setting: 'urban',
@@ -2486,6 +2712,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'on an empty bench',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'stillness'],
     pivot: 'absence',
     setting: 'urban',
@@ -2495,6 +2722,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the last train doors close',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     pivot: 'acceptance',
     setting: 'urban',
@@ -2508,6 +2736,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a train whistle fades',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'time'],
     pivot: 'time-shift',
     setting: 'urban',
@@ -2521,6 +2750,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'I turn off my phone',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'stillness'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2536,6 +2766,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'doing the dishes',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'time'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2545,6 +2776,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'losing track of time',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'time-shift',
     setting: 'domestic',
@@ -2554,6 +2786,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'hunting for carrots',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -2563,6 +2796,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'where did the sun go?',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     pivot: 'question',
     setting: 'natural',
@@ -2572,6 +2806,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'my battery drains',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2587,6 +2822,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'with my eyes half shut',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2601,6 +2837,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'ants walking the path',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     pivot: 'observer',
     setting: 'natural',
@@ -2613,6 +2850,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'who keeps the lights on?',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light'],
     pivot: 'question',
     setting: 'domestic',
@@ -2622,6 +2860,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'I squint to see you',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     pivot: 'observer',
     setting: 'natural',
@@ -2635,6 +2874,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'coffee cools on glass',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'stillness'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2647,6 +2887,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'taxi waits in rain',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'time'],
     pivot: 'observer',
     setting: 'urban',
@@ -2659,6 +2900,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'blue light fills the room',
     syllables: 5,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['light', 'stillness'],
     pivot: 'scale-shift',
     setting: 'domestic',
@@ -2671,6 +2913,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'city lights, not stars',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'sky'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2683,6 +2926,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'rain on fresh tarmac',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2695,6 +2939,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'I hear no secrets',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -2708,6 +2953,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'her perfume lingers',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2717,6 +2963,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'incense chokes my throat',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2732,6 +2979,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'sitting in stale rooms',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2741,6 +2989,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'sour lemon in tea',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2754,6 +3003,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: "my bath water's cold",
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'time'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2769,6 +3019,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the moon in my cup',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'water'],
     pivot: 'scale-shift',
     setting: 'domestic',
@@ -2784,6 +3035,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'garlic breath remains',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2796,6 +3048,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no one sees this light',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['light', 'absence'],
     pivot: 'absence',
     setting: 'natural',
@@ -2805,6 +3058,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the bus passes by',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'time-shift',
     setting: 'urban',
@@ -2815,6 +3069,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'I still smell burning',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'observer',
     setting: 'domestic',
@@ -2828,6 +3083,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'traffic hums below',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['sound', 'sky'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2837,6 +3093,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'karaoke lights',
     syllables: 5,
     season: 'none',
+    time_of_day: 'night',
     clusters: ['light', 'sound'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2846,6 +3103,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the water moves on',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'time'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -2855,6 +3113,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'below the surface',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['water', 'absence'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -2864,6 +3123,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the kettle sits cold',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['stillness', 'absence'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2874,6 +3134,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a shoe left behind',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'urban',
@@ -2884,6 +3145,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'his chair waits, empty',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -2893,6 +3155,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'cold tea sits half-full',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['absence', 'stillness'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -2903,6 +3166,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the clock stopped at three',
     syllables: 5,
     season: 'none',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'time-shift',
     setting: 'domestic',
@@ -2915,6 +3179,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'rain on the stone path',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -2928,6 +3193,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a sparrow flies on',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['sky'],
     pivot: 'observer',
     setting: 'natural',
@@ -2937,6 +3203,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'moss grows on the gate',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'stone'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -2949,6 +3216,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'frost melts on the grass',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['water', 'growth'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -2962,6 +3230,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'neon in puddles',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['light', 'water'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -2974,6 +3243,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'lost in daffodils',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -2984,6 +3254,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a jackdaw returns',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['sky'],
     pivot: 'observer',
     setting: 'natural',
@@ -2993,6 +3264,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'buds shiver, not bloom',
     syllables: 5,
     season: 'spring',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     pivot: 'absence',
     setting: 'natural',
@@ -3004,6 +3276,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the pond so still now',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'stillness'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -3013,6 +3286,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'clouds cross the summit',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky', 'stone'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3025,6 +3299,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the rain starts to fall',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3034,6 +3309,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'where the sea meets sand',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3046,6 +3322,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no end to the sun',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'time'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -3055,6 +3332,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'heavy air hangs still',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['sky', 'stillness'],
     pivot: 'acceptance',
     setting: 'natural',
@@ -3064,6 +3342,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'long shadows on grass',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['light', 'growth'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3076,6 +3355,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'while the lizards bask',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth', 'stillness'],
     pivot: 'observer',
     setting: 'natural',
@@ -3085,6 +3365,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a mosquito lurks',
     syllables: 5,
     season: 'summer',
+    time_of_day: 'none',
     clusters: ['growth'],
     pivot: 'observer',
     setting: 'natural',
@@ -3096,6 +3377,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'shadows lengthen now',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'dusk',
     clusters: ['light', 'time'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3105,6 +3387,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'cold rain on my face',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['water', 'absence'],
     pivot: 'observer',
     setting: 'natural',
@@ -3120,6 +3403,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'crickets start to sing',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sound'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3129,6 +3413,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'just a fallen leaf',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     pivot: 'absence',
     setting: 'natural',
@@ -3138,6 +3423,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'who raked this old stone?',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['stone', 'time'],
     pivot: 'question',
     setting: 'natural',
@@ -3147,6 +3433,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'where does the wind go',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sky'],
     pivot: 'question',
     setting: 'natural',
@@ -3156,6 +3443,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the harvest moon hangs',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['light', 'sky'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3165,6 +3453,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a cat slips away',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -3175,6 +3464,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'where has summer gone?',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['time', 'absence'],
     pivot: 'question',
     setting: 'natural',
@@ -3184,6 +3474,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'I turn the clock back',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['time'],
     pivot: 'time-shift',
     setting: 'domestic',
@@ -3199,6 +3490,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'woodsmoke in the air',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sky'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3211,6 +3503,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the bell calls through mist',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['sound'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3224,6 +3517,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the final leaf falls',
     syllables: 5,
     season: 'autumn',
+    time_of_day: 'none',
     clusters: ['growth', 'absence'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3235,6 +3529,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'a crow calls from high',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sky', 'sound'],
     pivot: 'observer',
     setting: 'natural',
@@ -3244,6 +3539,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no fire warms this place',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'absence',
     setting: 'domestic',
@@ -3254,6 +3550,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'no birds sing today',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence', 'sound'],
     pivot: 'absence',
     setting: 'natural',
@@ -3263,6 +3560,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'one star, nothing else',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'night',
     clusters: ['sky', 'absence'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3272,6 +3570,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the mountain holds still',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['stone', 'stillness'],
     pivot: 'scale-shift',
     setting: 'natural',
@@ -3281,6 +3580,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the river runs cold',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water'],
     pivot: 'time-shift',
     setting: 'natural',
@@ -3290,6 +3590,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'snow covers the road',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['water', 'stone'],
     pivot: 'scale-shift',
     setting: 'urban',
@@ -3303,6 +3604,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the kettle whistles',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sound'],
     pivot: 'acceptance',
     setting: 'domestic',
@@ -3313,6 +3615,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'the subway doors close',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['sound', 'absence'],
     pivot: 'acceptance',
     setting: 'urban',
@@ -3326,6 +3629,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'cat tracks in the snow',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'none',
     clusters: ['absence'],
     pivot: 'observer',
     setting: 'natural',
@@ -3339,6 +3643,7 @@ export const line3Fragments: readonly Line3Fragment[] = [
     text: 'stars hide behind clouds',
     syllables: 5,
     season: 'winter',
+    time_of_day: 'night',
     clusters: ['sky', 'absence'],
     pivot: 'absence',
     setting: 'natural',

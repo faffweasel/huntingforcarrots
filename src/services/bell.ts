@@ -1,6 +1,6 @@
 export interface Bells {
-  readonly begin: HTMLAudioElement;
-  readonly complete: HTMLAudioElement;
+  readonly single: HTMLAudioElement;
+  readonly zazen: HTMLAudioElement;
 }
 
 /**
@@ -8,18 +8,32 @@ export interface Bells {
  * Call once on first user gesture, cache the returned object.
  */
 export function loadBells(): Bells {
-  const begin = new Audio('/audio/bell-begin.mp3');
-  const complete = new Audio('/audio/bell-complete.mp3');
-  begin.load();
-  complete.load();
-  return { begin, complete };
+  const single = new Audio('/audio/bell-single.mp3');
+  const zazen = new Audio('/audio/bell-zazen.mp3');
+  single.preload = 'auto';
+  zazen.preload = 'auto';
+  single.load();
+  zazen.load();
+  return { single, zazen };
 }
 
 /**
- * Plays a singing bowl sample from the start.
- * Safe to call while already playing (rewinds first).
+ * Plays a bell and waits for it to finish. Always resolves (never rejects)
+ * so a failed bell never blocks the timer from starting.
+ */
+export function strikeBellAndWait(audio: HTMLAudioElement): Promise<void> {
+  return new Promise<void>((resolve) => {
+    audio.currentTime = 0;
+    audio.addEventListener('ended', () => resolve(), { once: true });
+    audio.addEventListener('error', () => resolve(), { once: true });
+    audio.play().catch(() => resolve());
+  });
+}
+
+/**
+ * Fire-and-forget bell strike. Errors are silently caught.
  */
 export function strikeBell(audio: HTMLAudioElement): void {
   audio.currentTime = 0;
-  audio.play();
+  audio.play().catch(() => {});
 }

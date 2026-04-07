@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAudio } from '../../hooks/useAudio';
 import { useCountdown } from '../../hooks/useCountdown';
 import { MAX_VAL, MIN_VAL, useScrollWheel } from '../../hooks/useScrollWheel';
@@ -94,6 +94,10 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
     isEnabled: isOpen && !isActive,
   });
 
+  // ── Bell-before-countdown state ───────────────────────────────────────
+  const [starting, setStarting] = useState(false);
+  const startingRef = useRef(false);
+
   // ── Refs ──────────────────────────────────────────────────────────────
   const iconRef = useRef<HTMLButtonElement>(null);
   const countdownRef = useRef<HTMLDivElement>(null);
@@ -103,12 +107,20 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
 
   // ── Actions ───────────────────────────────────────────────────────────
 
-  function handleStart() {
-    // ensureAudio + strikeBegin must both run synchronously in the click
-    // handler call stack — iOS WebKit drops audio started in .then() callbacks
+  async function handleStart() {
+    if (startingRef.current) return;
+    startingRef.current = true;
+    setStarting(true);
+    // ensureAudio + play() must both run synchronously in the click handler
+    // call stack — iOS WebKit drops audio started in .then() callbacks.
+    // strikeBellAndWait calls play() synchronously, then awaits 'ended'.
     audio.ensureAudio();
-    countdown.start(wheel.duration * 60);
-    audio.strikeBegin();
+    await audio.strikeBeginAndWait(wheel.duration);
+    if (startingRef.current) {
+      countdown.start(wheel.duration * 60);
+    }
+    startingRef.current = false;
+    setStarting(false);
   }
 
   function handlePause() {
@@ -121,6 +133,8 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
   }
 
   function handleReset() {
+    startingRef.current = false;
+    setStarting(false);
     countdown.stop();
     wheel.resetPosition();
   }
@@ -341,6 +355,7 @@ export function Timer({ isOpen, onToggle, onClose }: TimerProps): ReactElement {
                   <button
                     type="button"
                     onClick={handleStart}
+                    disabled={starting}
                     aria-label="Start meditation timer"
                     className={actionBtnClass}
                   >

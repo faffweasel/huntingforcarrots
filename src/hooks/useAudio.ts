@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import type { Bells } from '../services/bell';
-import { loadBells, strikeBell } from '../services/bell';
+import { loadBells, strikeBell, strikeBellAndWait } from '../services/bell';
 
 interface UseAudioReturn {
   readonly ensureAudio: () => void;
-  readonly strikeBegin: () => void;
+  readonly strikeBeginAndWait: (durationMinutes: number) => Promise<void>;
   readonly strikeComplete: () => void;
 }
 
@@ -17,17 +17,19 @@ export function useAudio(): UseAudioReturn {
     }
   }
 
-  function strikeBegin(): void {
+  function strikeBeginAndWait(durationMinutes: number): Promise<void> {
     if (bellsRef.current) {
-      strikeBell(bellsRef.current.begin);
+      const bell = durationMinutes >= 10 ? bellsRef.current.zazen : bellsRef.current.single;
+      return strikeBellAndWait(bell);
     }
+    return Promise.resolve();
   }
 
   function strikeComplete(): void {
     if (bellsRef.current) {
-      strikeBell(bellsRef.current.complete);
+      strikeBell(bellsRef.current.single);
     }
   }
 
-  return { ensureAudio, strikeBegin, strikeComplete };
+  return { ensureAudio, strikeBeginAndWait, strikeComplete };
 }

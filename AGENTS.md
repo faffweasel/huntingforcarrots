@@ -1,4 +1,4 @@
-# CLAUDE.md — huntingforcarrots
+# AGENTS.md: huntingforcarrots
 
 ## Project
 
@@ -22,7 +22,17 @@ npm run build        # Production build → dist/
 npm run preview      # Preview production build locally
 npm run check        # Biome lint + format check
 npm run format       # Biome auto-format
+npm run test         # Vitest
 ```
+
+## Dependency licences
+
+After adding, removing or updating dependencies (including transitive packages),
+review and update the manually maintained `public/licence.txt` with the versions
+and full copyright/licence notices for code or CSS shipped in the website.
+Include notices for distributed third-party assets, such as fonts, too. Keep the
+application's licence and logo rights consistent with `LICENCE` and `README.md`.
+Vite copies this file to `dist/licence.txt` during the build.
 
 ## TypeScript
 
@@ -220,7 +230,7 @@ Fragment composition, not word-level slot-filling. Three banks of curated line f
 - Components: one component per file, filename matches export name.
 - Commit messages: imperative mood, one logical unit per commit.
 - `console.log` is permitted behind `import.meta.env.DEV` gate for garden generation diagnostics. These are tree-shaken from production builds.
-- Git stays manual. Never commit or push from Claude Code.
+- Git stays manual. Never commit or push from an AI coding agent.
 
 ## Do NOT
 

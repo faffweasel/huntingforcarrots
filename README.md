@@ -40,9 +40,14 @@ Between 8pm and 6am local time, the garden shifts to dusk mode — cool sky, war
 
 ## Licence
 
-All code in this repository is licensed under the AGPL-3.0
+All code in this repository is licensed under AGPL-3.0-only
 **unless a directory contains a LICENCE or LICENCE.md file**,
 in which case that file applies to the code in that subdirectory.
+
+The application's full licence and third-party notices are in
+[`public/licence.txt`](public/licence.txt), copied to `dist/licence.txt` during
+the build and served at `/licence.txt`. Third-party code, CSS and fonts retain
+their respective licences listed in that file.
 
 ---
 
